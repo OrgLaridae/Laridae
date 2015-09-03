@@ -40,6 +40,7 @@ public class MyClient {
 
             conn.disconnect();
 
+
             JSONParser parser=new JSONParser();
             Object obj=parser.parse(finalOutput);
             JSONObject jsonObj=(JSONObject)obj;
