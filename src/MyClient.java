@@ -43,6 +43,7 @@ public class MyClient {
             JSONParser parser=new JSONParser();
             Object obj=parser.parse(finalOutput);
             JSONObject jsonObj=(JSONObject)obj;
+            /////
 
             //String temperature=jsonObj.get("");
 
