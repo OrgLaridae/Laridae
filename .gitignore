@@ -5,6 +5,8 @@ Laridae.iml
 
 REST.iml
 
-.idea
+.idea/*
 
-out
+out/*
+
+.gitignore
