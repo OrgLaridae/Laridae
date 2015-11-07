@@ -1,3 +1,8 @@
+package ML;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,15 +35,25 @@ public class SataliteRead {
         return Z;
     }
 
+    public static void writeZ(String location, double[][] Z){
+        Path path = Paths.get(location);
+        File file = path.toFile();
+        try {
+            file.createNewFile();
+            FileWriter fw = new FileWriter(file.getAbsoluteFile());
+            BufferedWriter bw = new BufferedWriter(fw);
 
-    public static void main(String[] args) {
-        double[][] val = dBZToZ("/Users/vidu/Desktop/sample/ekxv0000.txt");
-        for (int i = 0; i <240; i++) {
-            for (int j = 0; j < 240; j++) {
-                System.out.print(val[i][j]+",");
+            for (int i = 0; i < Z.length; i++) {
+                for (int j = 0; j < Z[i].length; j++) {
+                    bw.write(Z[i][j]+",");
+                }
+                bw.newLine();
             }
-            System.out.println();
+            bw.close();
+        }catch (IOException ex){
+
         }
     }
+
 
 }
