@@ -1,12 +1,7 @@
-
-*.class
-
 Laridae.iml
 
 REST.iml
 
-.idea/*
+.idea
 
-out/*
-
-.gitignore
+out
