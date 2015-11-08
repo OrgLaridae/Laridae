@@ -1,7 +1,6 @@
 import ML.Imaging;
 import ML.KMeansClass;
 import org.apache.spark.mllib.linalg.Vector;
-import org.apache.spark.mllib.linalg.Vectors;
 
 import java.util.ArrayList;
 
@@ -11,10 +10,12 @@ public class Main {
 
     public static void main(String[] args) {
         String path = "/Users/vidu/Desktop/sample/";
-        double[][] val = SataliteRead.dBZToZ(path + "ekxv0010.txt");
-        SataliteRead.writeZ(path + "z.txt", val);
+        double[][] val = RadarData.dBZToZ(path + "ekxv0000.txt");
+        RadarData.writeZ(path + "z.txt", val);
 
-        ArrayList<Vector>[] clusters= KMeansClass.run(path, 20, 1, 0, 0, width, height);
+        ArrayList<Vector> vals = RadarData.readZ(path + "z.txt", 25, 62, 172, 194);
+
+        ArrayList<Vector>[] clusters= KMeansClass.run(vals, 20, 1);
 
         Imaging.drawClusters(clusters, width, height, path + "clusters.png");
         Imaging.drawPoints(clusters, width, width, path + "points.png");

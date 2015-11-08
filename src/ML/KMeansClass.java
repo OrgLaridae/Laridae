@@ -31,7 +31,7 @@ public class KMeansClass {
                 //if (boundTopLeftX<x && x<boundBottomRightX && boundTopLeftY<y && y<boundBottomRightY){
                     Double value = Double.parseDouble(tok[x]);
                     if (value > 0.007)
-                    values.add(Vectors.dense(x, y, 0));//value));
+                        values.add(Vectors.dense(x, y, 0));//value));
                 //}
             }
             y++;
@@ -42,8 +42,7 @@ public class KMeansClass {
 
 
 
-    public static ArrayList<Vector>[] run(String parentPath, int iterations, int runs,
-                                          int boundTopLeftX, int boundTopLeftY, int boundBottomRightX, int boundBottomRightY) {
+    public static ArrayList<Vector>[] run(String parentPath, int iterations, int runs) {
 
 
         String inputFile = parentPath + "z.txt";
@@ -84,7 +83,40 @@ public class KMeansClass {
 
         sc.stop();
 
-        System.out.println(k);
+        return clusters;
+
+
+    }
+
+    public static ArrayList<Vector>[] run(ArrayList<Vector> vals, int iterations, int runs) {
+
+
+
+        SparkConf sparkConf = new SparkConf().setAppName("JavaKMeans");
+        JavaSparkContext sc = new JavaSparkContext(sparkConf);
+        JavaRDD<Vector> points = sc.parallelize(vals);
+
+        int k = findK(points, iterations, runs);
+
+
+        KMeansModel model = KMeans.train(points.rdd(), k, iterations, runs, KMeans.K_MEANS_PARALLEL());
+        JavaRDD<Integer> values = model.predict(points);
+
+
+        ArrayList<Vector>[] clusters = new ArrayList[k];
+        for (int i = 0; i < k; i++) {
+            clusters[i] = new ArrayList<>();
+        }
+
+
+        List<Vector> pointList = points.collect();
+        List<Integer> valueList = values.collect();
+
+        for (int i = 0; i < pointList.size(); i++) {
+            clusters[valueList.get(i)].add(pointList.get(i));
+        }
+        sc.stop();
+
         return clusters;
 
 

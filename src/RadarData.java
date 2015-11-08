@@ -1,3 +1,9 @@
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.mllib.linalg.Vector;
+import org.apache.spark.mllib.linalg.Vectors;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -5,10 +11,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class SataliteRead {
+public class RadarData {
     public static double[][] dBZToZ(String location){
         double[][] Z = new double[240][240];
         double alpha = 0.5;
@@ -25,6 +32,26 @@ public class SataliteRead {
                     data = Math.pow(10, (data/10));
                     Z[i][j] = data;
 
+                }
+            }
+        } catch (IOException ex) {
+
+        }
+        return Z;
+    }
+
+    public static ArrayList<Vector> readZ(String location,
+                                         int boundTopLeftX, int boundTopLeftY, int boundBottomRightX, int boundBottomRightY){
+        ArrayList<Vector> Z = new ArrayList<>();
+        Path path = Paths.get(location);
+        try (Stream<String> lines = Files.lines(path)) {
+            String[] lineArray = lines.collect(Collectors.toList()).toArray(new String[0]);
+            for (int y = boundTopLeftY; y < boundBottomRightY; y++) {
+                String[] stringData = lineArray[y].split(",");
+                for (int x = boundTopLeftX; x < boundBottomRightX; x++) {
+                    double data = Double.parseDouble(stringData[x]);
+                    if (data > 0.007)
+                        Z.add(Vectors.dense(x,y,0));//data));
                 }
             }
         } catch (IOException ex) {
