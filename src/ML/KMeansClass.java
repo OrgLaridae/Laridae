@@ -41,6 +41,7 @@ public class KMeansClass {
 
 
 
+
     public static ArrayList<Vector>[] run(String parentPath, int iterations, int runs,
                                           int boundTopLeftX, int boundTopLeftY, int boundBottomRightX, int boundBottomRightY) {
 
@@ -88,6 +89,35 @@ public class KMeansClass {
 
 
     }
+
+    public static Vector[] getBounds(ArrayList<Vector> list, int width, int height){
+        double left = width;
+        double right = 0;
+        double top = height;
+        double bottom = 0;
+
+        for(Vector point:list){
+            if(left>point.apply(0)){
+                left = point.apply(0);
+            }
+            if(right<point.apply(0)){
+                right = point.apply(0);
+            }
+            if(top>point.apply(1)){
+                top = point.apply(1);
+            }
+            if(bottom<point.apply(1)){
+                bottom = point.apply(1);
+            }
+
+        }
+
+        Vector upper = Vectors.dense(left,top);
+        Vector lower = Vectors.dense(right,bottom);
+
+        return new Vector[]{upper, lower};
+    }
+
 
     public static int findK(JavaRDD<Vector> points, int iterations, int runs){
         int kMax = (int)Math.sqrt(points.count());

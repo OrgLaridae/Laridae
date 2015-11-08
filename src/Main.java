@@ -1,5 +1,5 @@
-package ML;
-
+import ML.Imaging;
+import ML.KMeansClass;
 import org.apache.spark.mllib.linalg.Vector;
 import org.apache.spark.mllib.linalg.Vectors;
 
@@ -21,39 +21,10 @@ public class Main {
 
         Vector[][] bounds = new Vector[clusters.length][2];
         for (int i = 0; i < clusters.length; i++) {
-            bounds[i] = getBounds(clusters[i]);
+            bounds[i] = KMeansClass.getBounds(clusters[i], width, height);
         }
         Imaging.drawBounds(clusters, bounds, width, height, path + "bounds.png");
 
     }
-
-    public static Vector[] getBounds(ArrayList<Vector> list){
-        double left = width;
-        double right = 0;
-        double top = height;
-        double bottom = 0;
-
-        for(Vector point:list){
-            if(left>point.apply(0)){
-                left = point.apply(0);
-            }
-            if(right<point.apply(0)){
-                right = point.apply(0);
-            }
-            if(top>point.apply(1)){
-                top = point.apply(1);
-            }
-            if(bottom<point.apply(1)){
-                bottom = point.apply(1);
-            }
-
-        }
-
-        Vector upper = Vectors.dense(left,top);
-        Vector lower = Vectors.dense(right,bottom);
-
-        return new Vector[]{upper, lower};
-    }
-
 }
 
