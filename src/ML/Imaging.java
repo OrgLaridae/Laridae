@@ -157,11 +157,6 @@ public class Imaging {
         private final static Map<Integer, Color> map = initNumberToColorMap();
         private static int factor;
 
-        /**
-         *
-         * @param value
-         *            should be from 0 unti 100
-         */
         public static Color numberToColor(final double value) {
             if (value < 0 || value > 100) {
                 return null;
