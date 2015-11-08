@@ -9,10 +9,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class Imaging {
 
-    public static void drawClusters(List<Integer> values, List<Vector> points, int width, int height, String location) {
+    public static void drawClusters(ArrayList<Vector>[] clusters, int width, int height, String location) {
         HashMap<Integer, Integer> colors = new HashMap<>();
         Random rand = new Random();
 
@@ -22,45 +24,126 @@ public class Imaging {
                 img.setRGB(rc, cc, Color.white.getRGB());
             }
         }
-        for (int i = 0; i < points.size(); i++) {
-            double[] vectorArray = points.get(i).toArray();
-            int x = (int) vectorArray[0];
-            int y = (int) vectorArray[1];
-            Integer colorVal = values.get(i);
-            if(!colors.containsKey(colorVal)){
-                Integer color = new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat()).getRGB();
-                colors.put(colorVal, color);
-                img.setRGB(x, y, color);
-            }else {
-                img.setRGB(x, y, colors.get(colorVal));
+
+        for (int i = 0; i < clusters.length; i++) {
+            ArrayList<Vector> points = clusters[i];
+            for (Vector point: points){
+                int x = ((int) point.apply(0));
+                int y = ((int) point.apply(1));
+                int colorVal = i;
+
+                if(!colors.containsKey(colorVal)){
+                    Integer color = new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat()).getRGB();
+                    colors.put(colorVal, color);
+                    img.setRGB(x, y, color);
+                }else {
+                    img.setRGB(x, y, colors.get(colorVal));
+                }
+
             }
         }
+//        for (int i = 0; i < points.size(); i++) {
+//            double[] vectorArray = points.get(i).toArray();
+//            int x = (int) vectorArray[0];
+//            int y = (int) vectorArray[1];
+//            Integer colorVal = values.get(i);
+//            if(!colors.containsKey(colorVal)){
+//                Integer color = new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat()).getRGB();
+//                colors.put(colorVal, color);
+//                img.setRGB(x, y, color);
+//            }else {
+//                img.setRGB(x, y, colors.get(colorVal));
+//            }
+//        }
 
-        try {
-            File outputfile = new File(location);
-            ImageIO.write(img, "png", outputfile);
-        } catch (IOException ex) {
-
-        }
+        writeImage(location, img);
     }
 
-    public static void drawPoints(List<Vector> points, int width, int height, String location) {
+    public static void drawPoints(ArrayList<Vector>[] clusters, int width, int height, String location) {
         BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         ColorHelper ch = new ColorHelper();
-        for (int i = 0; i < points.size(); i++) {
-            double[] vectorArray = points.get(i).toArray();
-            int x = (int) vectorArray[0];
-            int y = (int) vectorArray[1];
-            double col = vectorArray[2];
 
-            Color color = ch.numberToColor(col);
-            if (color != null) {
-                img.setRGB(x, y, ch.numberToColor(col).getRGB());
-            } else {
-                img.setRGB(x, y, Color.white.getRGB());
+        for (int i = 0; i < clusters.length; i++) {
+            ArrayList<Vector> points = clusters[i];
+            for (Vector point: points){
+                int x = ((int) point.apply(0));
+                int y = ((int) point.apply(1));
+                double col = point.apply(2);
+
+                Color color = ch.numberToColor(col);
+                if (color != null) {
+                    img.setRGB(x, y, ch.numberToColor(col).getRGB());
+                } else {
+                    img.setRGB(x, y, Color.white.getRGB());
+                }
             }
         }
 
+//        for (int i = 0; i < points.size(); i++) {
+//            double[] vectorArray = points.get(i).toArray();
+//            int x = (int) vectorArray[0];
+//            int y = (int) vectorArray[1];
+//            double col = vectorArray[2];
+//
+//            Color color = ch.numberToColor(col);
+//            if (color != null) {
+//                img.setRGB(x, y, ch.numberToColor(col).getRGB());
+//            } else {
+//                img.setRGB(x, y, Color.white.getRGB());
+//            }
+//        }
+
+        writeImage(location, img);
+    }
+
+    public static void drawBounds(ArrayList<Vector>[] clusters, Vector[][] bounds, int width, int height, String location){
+        HashMap<Integer, Integer> colors = new HashMap<>();
+        Random rand = new Random();
+
+        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        for (int rc = 0; rc < height; rc++) {
+            for (int cc = 0; cc < width; cc++) {
+                img.setRGB(rc, cc, Color.white.getRGB());
+            }
+        }
+
+        for (int i = 0; i < clusters.length; i++) {
+            ArrayList<Vector> points = clusters[i];
+            for (Vector point: points){
+                int x = ((int) point.apply(0));
+                int y = ((int) point.apply(1));
+                int colorVal = i;
+
+                if(!colors.containsKey(colorVal)){
+                    Integer color = new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat()).getRGB();
+                    colors.put(colorVal, color);
+                    img.setRGB(x, y, color);
+                }else {
+                    img.setRGB(x, y, colors.get(colorVal));
+                }
+
+            }
+        }
+        Graphics2D graph = img.createGraphics();
+
+        for (Vector[] bound_2: bounds){
+            int x1 = ((int) bound_2[0].apply(0));
+            int y1 = ((int) bound_2[0].apply(1));
+            int x2 = ((int) bound_2[1].apply(0));
+            int y2 = ((int) bound_2[1].apply(1));
+
+            graph.setColor(Color.GREEN);
+            graph.drawRect(x1, y1, x2 - x1, y2 - y1);
+        }
+
+        graph.dispose();
+
+        writeImage(location, img);
+
+    }
+
+
+    public static void writeImage(String location, BufferedImage img){
         try {
             File outputfile = new File(location);
             ImageIO.write(img, "png", outputfile);
@@ -68,7 +151,6 @@ public class Imaging {
 
         }
     }
-
     public static class ColorHelper {
 
         private final static int LOW = 0;

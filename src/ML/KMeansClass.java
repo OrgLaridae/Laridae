@@ -4,10 +4,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.Function2;
-import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.api.java.function.*;
 import org.apache.spark.mllib.clustering.KMeans;
 import org.apache.spark.mllib.clustering.KMeansModel;
 import org.apache.spark.mllib.linalg.Vector;
@@ -20,26 +17,33 @@ import java.util.regex.Pattern;
 
 public class KMeansClass {
 
+
     private static class ParsePoint implements FlatMapFunction<String, Vector> {
+
         private static final Pattern COMMA = Pattern.compile(",");
-        int x = 0;
+        int y = 0;
         @Override
         public Iterable<Vector> call(String line) {
             String[] tok = COMMA.split(line);
             int points = tok.length;
             ArrayList<Vector> values = new ArrayList<>();
-            for (int i = 0; i < points; ++i) {
-                Double value = Double.parseDouble(tok[i]);
-                if(value>0.007)
-                    values.add(Vectors.dense(x,i,0));//value));
+            for (int x = 0; x < points; ++x) {
+                //if (boundTopLeftX<x && x<boundBottomRightX && boundTopLeftY<y && y<boundBottomRightY){
+                    Double value = Double.parseDouble(tok[x]);
+                    if (value > 0.007)
+                    values.add(Vectors.dense(x, y, 0));//value));
+                //}
             }
-            x++;
+            y++;
             return values;
         }
     }
 
 
-    public static List[] run(String parentPath, int iterations, int runs) {
+
+    public static ArrayList<Vector>[] run(String parentPath, int iterations, int runs,
+                                          int boundTopLeftX, int boundTopLeftY, int boundBottomRightX, int boundBottomRightY) {
+
 
         String inputFile = parentPath + "z.txt";
 
@@ -49,10 +53,24 @@ public class KMeansClass {
 
         JavaRDD<Vector> points = lines.flatMap(new ParsePoint());
         int k = findK(points, iterations, runs);
+
+
         KMeansModel model = KMeans.train(points.rdd(), k, iterations, runs, KMeans.K_MEANS_PARALLEL());
-
-
         JavaRDD<Integer> values = model.predict(points);
+
+
+        ArrayList<Vector>[] clusters = new ArrayList[k];
+        for (int i = 0; i < k; i++) {
+            clusters[i] = new ArrayList<>();
+        }
+
+
+        List<Vector> pointList = points.collect();
+        List<Integer> valueList = values.collect();
+
+        for (int i = 0; i < pointList.size(); i++) {
+            clusters[valueList.get(i)].add(pointList.get(i));
+        }
 
 
 //    System.out.println("Cluster centers:");
@@ -63,13 +81,10 @@ public class KMeansClass {
 //    System.out.println("Cost: " + cost);
 
 
-        List<Integer> valueList = values.collect();
-        List<Vector> pointList = points.collect();
-
         sc.stop();
 
         System.out.println(k);
-        return new List[]{valueList, pointList};
+        return clusters;
 
 
     }
