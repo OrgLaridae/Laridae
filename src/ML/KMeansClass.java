@@ -28,11 +28,9 @@ public class KMeansClass {
             int points = tok.length;
             ArrayList<Vector> values = new ArrayList<>();
             for (int x = 0; x < points; ++x) {
-                //if (boundTopLeftX<x && x<boundBottomRightX && boundTopLeftY<y && y<boundBottomRightY){
-                    Double value = Double.parseDouble(tok[x]);
-                    if (value > 0.007)
-                        values.add(Vectors.dense(x, y, 0));//value));
-                //}
+                Double value = Double.parseDouble(tok[x]);
+                if (value > 0.007)
+                    values.add(Vectors.dense(x, y, 0));//value));
             }
             y++;
             return values;
