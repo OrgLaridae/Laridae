@@ -1,5 +1,6 @@
 import ML.Imaging;
 import ML.KMeansClass;
+import ML.RadarData;
 import org.apache.spark.mllib.linalg.Vector;
 
 import java.util.ArrayList;
@@ -11,7 +12,11 @@ public class Main {
     public static void main(String[] args) {
         String path = "/Users/vidu/Desktop/sample/";
         double[][] val = RadarData.dBZToZ(path + "ekxv0000.txt");
+
         RadarData.writeZ(path + "z.txt", val);
+
+        RadarData.setSensitivity(0.01);
+        RadarData.calculateThreashold();
 
         ArrayList<Vector> vals = RadarData.readZ(path + "z.txt", 25, 62, 172, 194);
 

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+
 public class KMeansClass {
 
 
@@ -29,15 +30,13 @@ public class KMeansClass {
             ArrayList<Vector> values = new ArrayList<>();
             for (int x = 0; x < points; ++x) {
                 Double value = Double.parseDouble(tok[x]);
-                if (value > 0.007)
-                    values.add(Vectors.dense(x, y, 0));//value));
+                if (value > RadarData.getThreshold())
+                    values.add(Vectors.dense(x, y, 0));//RadarData.getSegmentedData(value)));
             }
             y++;
             return values;
         }
     }
-
-
 
 
     public static ArrayList<Vector>[] run(String parentPath, int iterations, int runs) {
@@ -154,9 +153,9 @@ public class KMeansClass {
         KMeansModel model = null;
         double Fk = 0;
         double ak = 0;
-        double ak_1 = 0; //ak - 1
+        double ak_1 = 0; //a(k - 1)
         double Sk = 0;
-        double Sk_1 = 0; //Sk - 1
+        double Sk_1 = 0; //S(k - 1)
 
         int dimensions = points.first().size();
 
@@ -228,7 +227,7 @@ public class KMeansClass {
         }
     }
 
-    public static double findak(int k, int Nd, double ak_1){
+    public static double findak(int k, int Nd, double ak_1/*a(k-1)*/){
         if(k==1){
             return 0.0;
         }else if(k==2){
@@ -238,7 +237,7 @@ public class KMeansClass {
         }
     }
 
-    public static double findFk(int k, double Sk, double Sk_1, double ak){
+    public static double findFk(int k, double Sk, double Sk_1 /*S(k-1)*/, double ak){
         if(k==1){
             return 1;
         }else if(Sk_1==0){

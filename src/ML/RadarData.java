@@ -1,6 +1,5 @@
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
+package ML;
+
 import org.apache.spark.mllib.linalg.Vector;
 import org.apache.spark.mllib.linalg.Vectors;
 
@@ -16,6 +15,14 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class RadarData {
+    static double min = Double.MAX_VALUE;
+    static double max = 0;
+//
+//    static int segments = 10;
+
+    private static double sensitivity = 0.01;
+    private static double threshold = 0.007;
+
     public static double[][] dBZToZ(String location){
         double[][] Z = new double[240][240];
         double alpha = 0.5;
@@ -31,9 +38,10 @@ public class RadarData {
                     data = (alpha*data)+beta;
                     data = Math.pow(10, (data/10));
                     Z[i][j] = data;
-
+                    setMinMax(data);
                 }
             }
+
         } catch (IOException ex) {
 
         }
@@ -42,6 +50,7 @@ public class RadarData {
 
     public static ArrayList<Vector> readZ(String location,
                                          int boundTopLeftX, int boundTopLeftY, int boundBottomRightX, int boundBottomRightY){
+
         ArrayList<Vector> Z = new ArrayList<>();
         Path path = Paths.get(location);
         try (Stream<String> lines = Files.lines(path)) {
@@ -50,8 +59,9 @@ public class RadarData {
                 String[] stringData = lineArray[y].split(",");
                 for (int x = boundTopLeftX; x < boundBottomRightX; x++) {
                     double data = Double.parseDouble(stringData[x]);
-                    if (data > 0.007)
-                        Z.add(Vectors.dense(x,y,0));//data));
+                    if (data > threshold) {
+                        Z.add(Vectors.dense(x, y, 0));//getSegmentedData(data)));
+                    }
                 }
             }
         } catch (IOException ex) {
@@ -80,5 +90,46 @@ public class RadarData {
         }
     }
 
+//    public static double getSegmentedData(double data){
+//        if(min>max){
+//            return -1;
+//        }else {
+//            double difference = max - min;
+//            double segmantLength = difference/segments;
+//            double segmantedValue = ((int)(data/segmantLength))*segmantLength;
+//            return segmantedValue;
+//        }
+//    }
 
+    private static void setMinMax(double data){
+
+        if(data<min){
+            min = data;
+        }
+        if(data>max){
+            max = data;
+        }
+    }
+
+    public static void setSensitivity(double sensitivity) {
+        if(sensitivity>1 || sensitivity<0){
+            RadarData.sensitivity = 1;
+        }else {
+            RadarData.sensitivity = sensitivity;
+        }
+    }
+
+    public static double getThreshold() {
+        return threshold;
+    }
+
+    public static boolean calculateThreashold(){
+        if(min>max){
+            return false;
+        }else {
+            double difference = max - min;
+            threshold = min + difference * sensitivity;
+            return true;
+        }
+    }
 }
