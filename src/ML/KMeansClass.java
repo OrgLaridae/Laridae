@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+
 public class KMeansClass {
 
 
@@ -28,11 +29,9 @@ public class KMeansClass {
             int points = tok.length;
             ArrayList<Vector> values = new ArrayList<>();
             for (int x = 0; x < points; ++x) {
-                //if (boundTopLeftX<x && x<boundBottomRightX && boundTopLeftY<y && y<boundBottomRightY){
-                    Double value = Double.parseDouble(tok[x]);
-                    if (value > 0.007)
-                    values.add(Vectors.dense(x, y, 0));//value));
-                //}
+                Double value = Double.parseDouble(tok[x]);
+                if (value > RadarData.getThreshold())
+                    values.add(Vectors.dense(x, y, 0));//RadarData.getSegmentedData(value)));
             }
             y++;
             return values;
@@ -40,9 +39,7 @@ public class KMeansClass {
     }
 
 
-
-    public static ArrayList<Vector>[] run(String parentPath, int iterations, int runs,
-                                          int boundTopLeftX, int boundTopLeftY, int boundBottomRightX, int boundBottomRightY) {
+    public static ArrayList<Vector>[] run(String parentPath, int iterations, int runs) {
 
 
         String inputFile = parentPath + "z.txt";
@@ -83,20 +80,82 @@ public class KMeansClass {
 
         sc.stop();
 
-        System.out.println(k);
         return clusters;
 
 
     }
+
+    public static ArrayList<Vector>[] run(ArrayList<Vector> vals, int iterations, int runs) {
+
+
+
+        SparkConf sparkConf = new SparkConf().setAppName("JavaKMeans");
+        JavaSparkContext sc = new JavaSparkContext(sparkConf);
+        JavaRDD<Vector> points = sc.parallelize(vals);
+
+        int k = findK(points, iterations, runs);
+
+
+        KMeansModel model = KMeans.train(points.rdd(), k, iterations, runs, KMeans.K_MEANS_PARALLEL());
+        JavaRDD<Integer> values = model.predict(points);
+
+
+        ArrayList<Vector>[] clusters = new ArrayList[k];
+        for (int i = 0; i < k; i++) {
+            clusters[i] = new ArrayList<>();
+        }
+
+
+        List<Vector> pointList = points.collect();
+        List<Integer> valueList = values.collect();
+
+        for (int i = 0; i < pointList.size(); i++) {
+            clusters[valueList.get(i)].add(pointList.get(i));
+        }
+        sc.stop();
+
+        return clusters;
+
+
+    }
+
+    public static Vector[] getBounds(ArrayList<Vector> list, int width, int height){
+        double left = width;
+        double right = 0;
+        double top = height;
+        double bottom = 0;
+
+        for(Vector point:list){
+            if(left>point.apply(0)){
+                left = point.apply(0);
+            }
+            if(right<point.apply(0)){
+                right = point.apply(0);
+            }
+            if(top>point.apply(1)){
+                top = point.apply(1);
+            }
+            if(bottom<point.apply(1)){
+                bottom = point.apply(1);
+            }
+
+        }
+
+        Vector upper = Vectors.dense(left,top);
+        Vector lower = Vectors.dense(right,bottom);
+
+        return new Vector[]{upper, lower};
+    }
+
 
     public static int findK(JavaRDD<Vector> points, int iterations, int runs){
         int kMax = (int)Math.sqrt(points.count());
         KMeansModel model = null;
         double Fk = 0;
         double ak = 0;
-        double ak_1 = 0; //ak - 1
+        double ak_1 = 0; //a(k - 1)
         double Sk = 0;
-        double Sk_1 = 0; //Sk - 1
+        double Sk_1 = 0; //S(k - 1)
 
         int dimensions = points.first().size();
 
@@ -168,7 +227,7 @@ public class KMeansClass {
         }
     }
 
-    public static double findak(int k, int Nd, double ak_1){
+    public static double findak(int k, int Nd, double ak_1/*a(k-1)*/){
         if(k==1){
             return 0.0;
         }else if(k==2){
@@ -178,7 +237,7 @@ public class KMeansClass {
         }
     }
 
-    public static double findFk(int k, double Sk, double Sk_1, double ak){
+    public static double findFk(int k, double Sk, double Sk_1 /*S(k-1)*/, double ak){
         if(k==1){
             return 1;
         }else if(Sk_1==0){
