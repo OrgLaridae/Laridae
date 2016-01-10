@@ -19,71 +19,71 @@ import java.util.regex.Pattern;
 public class KMeansClass {
 
 
-    private static class ParsePoint implements FlatMapFunction<String, Vector> {
-
-        private static final Pattern COMMA = Pattern.compile(",");
-        int y = 0;
-        @Override
-        public Iterable<Vector> call(String line) {
-            String[] tok = COMMA.split(line);
-            int points = tok.length;
-            ArrayList<Vector> values = new ArrayList<>();
-            for (int x = 0; x < points; ++x) {
-                Double value = Double.parseDouble(tok[x]);
-                if (value > RadarData.getThreshold())
-                    values.add(Vectors.dense(x, y, 0));//RadarData.getSegmentedData(value)));
-            }
-            y++;
-            return values;
-        }
-    }
-
-
-    public static ArrayList<Vector>[] run(String parentPath, int iterations, int runs) {
-
-
-        String inputFile = parentPath + "z.txt";
-
-        SparkConf sparkConf = new SparkConf().setAppName("JavaKMeans");
-        JavaSparkContext sc = new JavaSparkContext(sparkConf);
-        JavaRDD<String> lines = sc.textFile(inputFile);
-
-        JavaRDD<Vector> points = lines.flatMap(new ParsePoint());
-        int k = findK(points, iterations, runs);
-
-
-        KMeansModel model = KMeans.train(points.rdd(), k, iterations, runs, KMeans.K_MEANS_PARALLEL());
-        JavaRDD<Integer> values = model.predict(points);
-
-
-        ArrayList<Vector>[] clusters = new ArrayList[k];
-        for (int i = 0; i < k; i++) {
-            clusters[i] = new ArrayList<>();
-        }
-
-
-        List<Vector> pointList = points.collect();
-        List<Integer> valueList = values.collect();
-
-        for (int i = 0; i < pointList.size(); i++) {
-            clusters[valueList.get(i)].add(pointList.get(i));
-        }
-
-
-//    System.out.println("Cluster centers:");
-//    for (Vector center : model.clusterCenters()) {
-//      System.out.println(" " + center);
+//    private static class ParsePoint implements FlatMapFunction<String, Vector> {
+//
+//        private static final Pattern COMMA = Pattern.compile(",");
+//        int y = 0;
+//        @Override
+//        public Iterable<Vector> call(String line) {
+//            String[] tok = COMMA.split(line);
+//            int points = tok.length;
+//            ArrayList<Vector> values = new ArrayList<>();
+//            for (int x = 0; x < points; ++x) {
+//                Double value = Double.parseDouble(tok[x]);
+//                if (value > RadarData.getThreshold())
+//                    values.add(Vectors.dense(x, y, 0));
+//            }
+//            y++;
+//            return values;
+//        }
 //    }
-//    double cost = model.computeCost(points.rdd());
-//    System.out.println("Cost: " + cost);
-
-
-        sc.stop();
-
-        return clusters;
-
-
-    }
+//
+//
+//    public static ArrayList<Vector>[] run(String parentPath, int iterations, int runs) {
+//
+//
+//        String inputFile = parentPath + "z.txt";
+//
+//        SparkConf sparkConf = new SparkConf().setAppName("JavaKMeans");
+//        JavaSparkContext sc = new JavaSparkContext(sparkConf);
+//        JavaRDD<String> lines = sc.textFile(inputFile);
+//
+//        JavaRDD<Vector> points = lines.flatMap(new ParsePoint());
+//        int k = findK(points, iterations, runs);
+//
+//
+//        KMeansModel model = KMeans.train(points.rdd(), k, iterations, runs, KMeans.K_MEANS_PARALLEL());
+//        JavaRDD<Integer> values = model.predict(points);
+//
+//
+//        ArrayList<Vector>[] clusters = new ArrayList[k];
+//        for (int i = 0; i < k; i++) {
+//            clusters[i] = new ArrayList<>();
+//        }
+//
+//
+//        List<Vector> pointList = points.collect();
+//        List<Integer> valueList = values.collect();
+//
+//        for (int i = 0; i < pointList.size(); i++) {
+//            clusters[valueList.get(i)].add(pointList.get(i));
+//        }
+//
+//
+////    System.out.println("Cluster centers:");
+////    for (Vector center : model.clusterCenters()) {
+////      System.out.println(" " + center);
+////    }
+////    double cost = model.computeCost(points.rdd());
+////    System.out.println("Cost: " + cost);
+//
+//
+//        sc.stop();
+//
+//        return clusters;
+//
+//
+//    }
 
     public static ArrayList<Vector>[] run(ArrayList<Vector> vals, int iterations, int runs) {
 
@@ -119,17 +119,17 @@ public class KMeansClass {
 
     }
 
-    public static Vector[] getBounds(ArrayList<Vector> list, int width, int height){
-        double left = width;
-        double right = 0;
-        double top = height;
+    public static Vector[] getBounds(ArrayList<Vector> list, int lon, int lat){
+        double left = 0;
+        double right = lon;
+        double top = lat;
         double bottom = 0;
 
         for(Vector point:list){
-            if(left>point.apply(0)){
+            if(left<point.apply(0)){
                 left = point.apply(0);
             }
-            if(right<point.apply(0)){
+            if(right>point.apply(0)){
                 right = point.apply(0);
             }
             if(top>point.apply(1)){
@@ -141,8 +141,8 @@ public class KMeansClass {
 
         }
 
-        Vector upper = Vectors.dense(left,top);
-        Vector lower = Vectors.dense(right,bottom);
+        Vector upper = Vectors.dense(top,left);
+        Vector lower = Vectors.dense(bottom,right);
 
         return new Vector[]{upper, lower};
     }
@@ -167,7 +167,7 @@ public class KMeansClass {
             ak = findak(k, dimensions, ak_1);
             Fk = findFk(k, Sk, Sk_1, ak);
 
-            if(Fk < 0.9){
+            if(Fk < 0.89){
                 return k;
             }
             Sk_1 = Sk;
@@ -229,7 +229,7 @@ public class KMeansClass {
 
     public static double findak(int k, int Nd, double ak_1/*a(k-1)*/){
         if(k==1){
-            return 0.0;
+            return 1.0;
         }else if(k==2){
             return  1.0-3.0/(4.0*Nd);
         }else{
