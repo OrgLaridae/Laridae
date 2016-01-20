@@ -31,10 +31,6 @@ public class WeatherAlerts {
     private SiddhiManager siddhiManager;
     private InputHandler madisInputHandler;
     private InputHandler radarInputHandler;
-    private static final int TIME_GAP = 1; //in minutes
-    private static final int THRESHOLD_LIFTED_INDEX=0;
-    private static final int THRESHOLD_HELICITY=150;
-    private static final int THRESHOLD_INHIBITION=-15;
 
     Main listener;
 
@@ -42,17 +38,11 @@ public class WeatherAlerts {
         this.listener = listener;
         this.siddhiManager = siddhiManager;
         madisInputHandler = siddhiManager.getInputHandler("WeatherStream");
-        radarInputHandler = siddhiManager.getInputHandler("reflectStream");
-//        calculateBoundary();
-//        highTemperatureAlert();
-//        radarDataBoundary();
-//        checkBatch();
         checkLiftedIndex();
         checkHelicity();
         checkInhibition();
         sendFilteredWeatherData();
-        calculateCommonBoundary(); //comment if not wanted to send the boundary calculated
-        radarDataBoundary();
+        calculateCommonBoundary();
     }
 
     public void SendDataToCEP(String stationId, double latitude, double longitude, double liftedIndex, double helicity, double inhibition) {
@@ -68,16 +58,16 @@ public class WeatherAlerts {
     //gets the Lifted Index and checks whether it is positive or negative
     //If the value is negative, the probability of occuring a thunderstorm is greater
     public void checkLiftedIndex() {
-        String checkIndex = siddhiManager.addQuery("from WeatherStream [liftedIndex<"+THRESHOLD_LIFTED_INDEX+"] #window.unique(stationId) as A " +
-                "join WeatherStream[liftedIndex<"+THRESHOLD_LIFTED_INDEX+"] #window.unique(stationId) as B " +
-                "on madis:isNearStation(A.latitude,A.longitude,B.latitude,B.longitude) and A.stationId != B.stationId " +
+        String checkIndex = siddhiManager.addQuery("from WeatherStream [liftedIndex<" + CEPEnvironment.THRESHOLD_LIFTED_INDEX + "] #window.length(50) as A " +
+                "join WeatherStream[liftedIndex<" + CEPEnvironment.THRESHOLD_LIFTED_INDEX + "] #window.length(50) as B " +
+                "on madis:isNearStation(A.latitude,A.longitude,B.latitude,B.longitude) " +
                 "select 'A' as streamId, A.stationId, A.latitude, A.longitude " +
                 "insert into FilteredDataStream ;");
 
         siddhiManager.addCallback(checkIndex, new QueryCallback() {
             public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-//                System.out.print("Lifted Index : ");
-//                EventPrinter.print(timeStamp, inEvents, removeEvents);
+                int k = inEvents.length;
+                System.out.println("Lifted Index : " + inEvents[k - 1].getData(1));
             }
         });
     }
@@ -89,16 +79,16 @@ public class WeatherAlerts {
     //threshold value is 150 m2/s2
 
     public void checkHelicity() {
-        String checkIndex = siddhiManager.addQuery("from WeatherStream [helicity>"+THRESHOLD_HELICITY+"] #window.length(50) as A " +
-                "join WeatherStream[helicity>"+THRESHOLD_HELICITY+"] #window.length(50) as B " +
+        String checkIndex = siddhiManager.addQuery("from WeatherStream [helicity>" + CEPEnvironment.THRESHOLD_HELICITY + "] #window.length(50) as A " +
+                "join WeatherStream[helicity>" + CEPEnvironment.THRESHOLD_HELICITY + "] #window.length(50) as B " +
                 "on madis:isNearStation(A.latitude,A.longitude,B.latitude,B.longitude) " +
                 "select 'E' as streamId, A.stationId,A.latitude,A.longitude " +
                 "insert into FilteredDataStream ;");
 
         siddhiManager.addCallback(checkIndex, new QueryCallback() {
             public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-//                System.out.print("Helicity Index : ");
-//                EventPrinter.print(timeStamp, inEvents, removeEvents);
+                int k = inEvents.length;
+                System.out.println("Helicity Index : " + inEvents[k - 1].getData(1));
             }
         });
     }
@@ -110,19 +100,20 @@ public class WeatherAlerts {
     //threshold value is 15J/kg
 
     public void checkInhibition() {
-        String checkIndex = siddhiManager.addQuery("from WeatherStream [inhibition<("+THRESHOLD_INHIBITION+")] #window.length(50) as A " +
-                "join WeatherStream[inhibition<("+THRESHOLD_INHIBITION+")] #window.length(50) as B " +
+        String checkIndex = siddhiManager.addQuery("from WeatherStream [inhibition<(" + CEPEnvironment.THRESHOLD_INHIBITION + ")] #window.length(50) as A " +
+                "join WeatherStream[inhibition<(" + CEPEnvironment.THRESHOLD_INHIBITION + ")] #window.length(50) as B " +
                 "on madis:isNearStation(A.latitude,A.longitude,B.latitude,B.longitude) " +
                 "select 'F' as streamId, A.stationId,A.latitude,A.longitude " +
                 "insert into FilteredDataStream ;");
 
         siddhiManager.addCallback(checkIndex, new QueryCallback() {
             public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-//                System.out.print("Convective Inhibition : ");
-//                EventPrinter.print(timeStamp, inEvents, removeEvents);
+                int k = inEvents.length;
+                System.out.println("Inhibition Index : " + inEvents[k - 1].getData(1));
             }
         });
     }
+
 
     //Total Totals Index
     //temperature parameters in Kelvin
@@ -201,7 +192,7 @@ public class WeatherAlerts {
     }
 
     public void precipitableWaterBoundary() {
-        String calBoundary = siddhiManager.addQuery("from PrecipitableWaterStream #window.timeBatch( " + TIME_GAP + " min ) " +
+        String calBoundary = siddhiManager.addQuery("from PrecipitableWaterStream #window.timeBatch( " + CEPEnvironment.TIME_GAP + " min ) " +
                 "select min(latitude) as minLatitude, max(latitude) as maxLatitude, min(longitude) as minLongitude, max(longitude) as maxLongitude, count(stationId) as dataCount " +
                 "insert into DataBoundary for all-events ; ");
 
@@ -213,30 +204,10 @@ public class WeatherAlerts {
         });
     }
 
-    //radar data processing
-    public void radarDataBoundary() {
-        String queryReference = siddhiManager.addQuery("from reflectStream select file:getPath(reflexMatrix) as filePath, radar:boundary(reflexMatrix) as boundary insert into boundaryStream ;");
-
-        siddhiManager.addCallback(queryReference, new QueryCallback() {
-            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-                //System.out.print("Radar : ");
-                EventPrinter.print(inEvents);
-            }
-        });
-    }
-
-    public void SendDataToCEP(String matrix) {
-        try {
-            radarInputHandler.send(new Object[]{matrix});
-        } catch (Exception e) {
-
-
-        }
-    }
 
     //calculate the common boundary
     public void calculateCommonBoundary() {
-        String calBoundary = siddhiManager.addQuery("from FilteredDataStream #window.timeBatch( "+TIME_GAP+" min ) " +
+        String calBoundary = siddhiManager.addQuery("from FilteredDataStream #window.timeBatch( " + CEPEnvironment.TIME_GAP + " min ) " +
                 "select min(latitude) as minLatitude, max(latitude) as maxLatitude, min(longitude) as minLongitude, max(longitude) as maxLongitude, count(stationId) as dataCount " +
                 "insert into DataBoundary for all-events ; ");
 
@@ -246,8 +217,8 @@ public class WeatherAlerts {
                 System.out.print("Resulting Boundary : ");
                 //format minLat maxLat minLon maxLon
                 //Eg Resulting Boundary : 53.915516 59.833235 -148.537948 -54.56872
-                String output=inEvents[k - 1].getData(0)+" "+inEvents[k - 1].getData(1)+" "+inEvents[k - 1].getData(2)+" "+inEvents[k - 1].getData(3);
-                System.out.println(inEvents[k - 1].getData(0)+" "+inEvents[k - 1].getData(1)+" "+inEvents[k - 1].getData(2)+" "+inEvents[k - 1].getData(3));
+                String output = inEvents[k - 1].getData(0) + " " + inEvents[k - 1].getData(1) + " " + inEvents[k - 1].getData(2) + " " + inEvents[k - 1].getData(3);
+                System.out.println(inEvents[k - 1].getData(0) + " " + inEvents[k - 1].getData(1) + " " + inEvents[k - 1].getData(2) + " " + inEvents[k - 1].getData(3));
                 BoundaryEvent event = new BoundaryEvent(this, output);
                 //add the code to notify the event lister
 
@@ -258,18 +229,15 @@ public class WeatherAlerts {
 
     //sends the data filtered as a string composed with location coordinates
     public void sendFilteredWeatherData() {
-        String calBoundary = siddhiManager.addQuery("from FilteredDataStream #window.timeBatch( "+TIME_GAP+" min ) " +
+        String calBoundary = siddhiManager.addQuery("from FilteredDataStream #window.timeBatch( " + CEPEnvironment.TIME_GAP + " min ) " +
                 "select weather:coordinates(latitude,longitude) as coordinates " +
                 "insert into CheckBatch for all-events ; ");
 
         siddhiManager.addCallback(calBoundary, new QueryCallback() {
             public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
                 int k = inEvents.length;
-//                System.out.print("Boundary Data : ");
-//                System.out.println(inEvents[k - 1].getData(0));
                 String data = inEvents[k - 1].getData(0).toString();
                 AlertEvent event = new AlertEvent(this, data);
-                //add the code to notify the event lister
                 listener.handleAlertEvent(event);
             }
         });

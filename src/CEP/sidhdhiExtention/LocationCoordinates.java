@@ -1,5 +1,6 @@
 package CEP.sidhdhiExtention;
 
+import CEP.cepProcessing.CEPEnvironment;
 import org.wso2.siddhi.core.config.SiddhiContext;
 import org.wso2.siddhi.core.executor.function.FunctionExecutor;
 import org.wso2.siddhi.query.api.definition.Attribute;
@@ -18,9 +19,6 @@ public class LocationCoordinates extends FunctionExecutor {
     Attribute.Type returnType;
     private long activatedAt = Long.MAX_VALUE;
     private StringBuilder builder;
-    private static final int TIME_GAP=1;//in minutes
-    private String filePath="/home/ruveni/Data/Test.txt";
-    File file=new File(filePath);
 
     @Override
     public void init(Attribute.Type[] types, SiddhiContext siddhiContext) {
@@ -38,10 +36,10 @@ public class LocationCoordinates extends FunctionExecutor {
             double lat=Double.parseDouble(String.valueOf(((Object[]) o)[0]));
             double lon=Double.parseDouble(String.valueOf(((Object[]) o)[1]));
 
-            if((System.currentTimeMillis()-activatedAt)>=(TIME_GAP*60*1000)){
+            if((System.currentTimeMillis()-activatedAt)>=(CEPEnvironment.TIME_GAP*60*1000)){
                 BufferedWriter bwr = null;
                 try {
-                    bwr = new BufferedWriter(new FileWriter(file));
+                    bwr = new BufferedWriter(new FileWriter(new File(CEPEnvironment.COORDINATE_FILE_PATH)));
                     //write contents of StringBuilder to a file
                     bwr.write(builder.toString());
                     bwr.flush();
@@ -60,7 +58,7 @@ public class LocationCoordinates extends FunctionExecutor {
         }
 
         //returns the calculated boundary
-        return filePath;
+        return CEPEnvironment.COORDINATE_FILE_PATH;
     }
 
     @Override

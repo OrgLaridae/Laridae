@@ -1,5 +1,6 @@
 package CEP.dataFeed;
 
+import CEP.cepProcessing.CEPEnvironment;
 import CEP.cepProcessing.WeatherAlerts;
 
 import java.io.IOException;
@@ -24,9 +25,9 @@ public class CSVFileReader implements Runnable{
         String[] liftedData=null,helicityData=null,inhibitData=null;
 
         //paths to the csv files
-        Path liftedPath = Paths.get("src/CEP/csvFiles/Best(4layer)liftedindex.csv");
-        Path helicityPath = Paths.get("src/CEP/csvFiles/stormrelativehelicity.csv");
-        Path inhibitPath = Paths.get("src/CEP/csvFiles/convectiveInhibition.csv");
+        Path liftedPath = Paths.get(CEPEnvironment.LIFTED_INDEX_FILE_PATH);
+        Path helicityPath = Paths.get(CEPEnvironment.HELICITY_INDEX_FILE_PATH);
+        Path inhibitPath = Paths.get(CEPEnvironment.CONVECTIVE_INHIBITION_FILE_PATH);
 
         //reads the csv data files
         try{

@@ -1,5 +1,6 @@
 package CEP.sidhdhiExtention;
 
+import CEP.cepProcessing.CEPEnvironment;
 import org.wso2.siddhi.core.config.SiddhiContext;
 import org.wso2.siddhi.core.exception.QueryCreationException;
 import org.wso2.siddhi.core.executor.function.FunctionExecutor;
@@ -16,9 +17,9 @@ import org.wso2.siddhi.query.api.extension.annotation.SiddhiExtension;
 @SiddhiExtension(namespace = "madis", function = "isNearStation")
 public class IsNearStation extends FunctionExecutor {
     Attribute.Type returnType;
-    private static final double DISTANCE_THRESHOLD = 40;
     private double latA = 0, lonA = 0, latB = 0, lonB = 0, dLat = 0, dLng = 0, a = 0, c = 0, dist = 0;
     boolean isNear=false;
+
     @Override
     public void init(Attribute.Type[] types, SiddhiContext siddhiContext) {
         returnType = Attribute.Type.BOOL;
@@ -56,7 +57,7 @@ public class IsNearStation extends FunctionExecutor {
                 dist = rad2deg(dist);
                 dist = dist * 60 * 1.1515*1.609344;
 
-                if (dist < DISTANCE_THRESHOLD) {
+                if (dist < CEPEnvironment.DISTANCE_THRESHOLD) {
                     isNear = true;
                 }
             }

@@ -1,8 +1,6 @@
 package CEP.cepProcessing;
 
 import CEP.sidhdhiExtention.LocationCoordinates;
-import CEP.sidhdhiExtention.RadarBoundary;
-import CEP.sidhdhiExtention.WeatherBoundary;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.config.SiddhiConfiguration;
 
@@ -18,11 +16,7 @@ public class CEPInitialize {
 
         //configuration to add siddhi extension
         List extensionClasses = new ArrayList();
-        extensionClasses.add(RadarBoundary.class);
-        extensionClasses.add(CEP.sidhdhiExtention.RadarFilePath.class);
         extensionClasses.add(CEP.sidhdhiExtention.IsNearStation.class);
-        extensionClasses.add(CEP.sidhdhiExtention.IsNearTimestamp.class);
-        extensionClasses.add(WeatherBoundary.class);
         extensionClasses.add(LocationCoordinates.class);
 
         SiddhiConfiguration siddhiConfiguration = new SiddhiConfiguration();
