@@ -53,8 +53,10 @@ public class LocationCoordinates extends FunctionExecutor {
                 activatedAt=System.currentTimeMillis();
             }
 
-            //locationCoord=locationCoord+lat+":"+lon+",";
-            builder.append(lat+":"+lon+"\n");
+            //adds the coordinate if it was not added before
+            if(builder.indexOf(lat+":"+lon)<0){
+                builder.append(lat+":"+lon+"\n");
+            }
         }
 
         //returns the calculated boundary
