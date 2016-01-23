@@ -48,8 +48,6 @@ public class CSVFileReader implements Runnable{
                 //System.out.println(liftedData[2]+" "+liftedData[3]+" ");
                 weatherAlert.SendDataToCEP(liftedData[2]+":"+liftedData[3],Double.parseDouble(liftedData[2]),Double.parseDouble(liftedData[3]),Double.parseDouble(liftedData[4]),Double.parseDouble(helicityData[4]),Double.parseDouble(inhibitData[4]));
             }
-            System.out.println("done");
-
         } catch (IOException ex) {
 
         }
