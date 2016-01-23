@@ -89,7 +89,7 @@ public class KMeansClass {
 
 
 
-        SparkConf sparkConf = new SparkConf().setAppName("JavaKMeans");
+        SparkConf sparkConf = new SparkConf().setAppName("JavaKMeans").setMaster("local");
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
         JavaRDD<Vector> points = sc.parallelize(vals);
 
