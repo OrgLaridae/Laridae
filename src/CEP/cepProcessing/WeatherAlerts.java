@@ -2,11 +2,14 @@ package CEP.cepProcessing;
 
 import CEP.customEvents.AlertEvent;
 import CEP.customEvents.BoundaryEvent;
+import CEP.customEvents.Location;
 import GUI.Main;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import org.wso2.siddhi.core.stream.input.InputHandler;
+
+import java.util.ArrayList;
 
 
 /**
@@ -29,17 +32,22 @@ import org.wso2.siddhi.core.stream.input.InputHandler;
 public class WeatherAlerts {
     private SiddhiManager siddhiManager;
     private InputHandler madisInputHandler;
+    private ArrayList<Location> coordinates;
+    private StringBuilder coordString;
+
 
     Main listener;
 
     public WeatherAlerts(SiddhiManager siddhiManager, Main listener) {
         this.listener = listener;
         this.siddhiManager = siddhiManager;
+        coordinates=new ArrayList<>();
+        coordString=new StringBuilder();
         madisInputHandler = siddhiManager.getInputHandler("WeatherStream");
         checkLiftedIndex();
         checkHelicity();
         checkInhibition();
-        sendFilteredWeatherData();
+        //sendFilteredWeatherData();
         calculateCommonBoundary();
     }
 
@@ -66,6 +74,12 @@ public class WeatherAlerts {
             public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
                 int k = inEvents.length;
                 System.out.println("Lifted Index : " + inEvents[k - 1].getData(1));
+
+                //adds the filtered coordinate to the array list
+                if(coordString.indexOf(inEvents[k - 1].getData(2)+":"+inEvents[k - 1].getData(3))<0){
+                    coordString.append(inEvents[k - 1].getData(2)+":"+inEvents[k - 1].getData(3)+",");
+                    coordinates.add(new Location(String.valueOf(inEvents[k - 1].getData(2)),String.valueOf(inEvents[k - 1].getData(3))));
+                }
             }
         });
     }
@@ -87,6 +101,12 @@ public class WeatherAlerts {
             public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
                 int k = inEvents.length;
                 System.out.println("Helicity Index : " + inEvents[k - 1].getData(1));
+
+                //adds the filtered coordinate to the array list
+                if(coordString.indexOf(inEvents[k - 1].getData(2)+":"+inEvents[k - 1].getData(3))<0){
+                    coordString.append(inEvents[k - 1].getData(2)+":"+inEvents[k - 1].getData(3)+",");
+                    coordinates.add(new Location(String.valueOf(inEvents[k - 1].getData(2)),String.valueOf(inEvents[k - 1].getData(3))));
+                }
             }
         });
     }
@@ -108,6 +128,12 @@ public class WeatherAlerts {
             public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
                 int k = inEvents.length;
                 System.out.println("Inhibition Index : " + inEvents[k - 1].getData(1));
+
+                //adds the filtered coordinate to the array list
+                if(coordString.indexOf(inEvents[k - 1].getData(2)+":"+inEvents[k - 1].getData(3))<0){
+                    coordString.append(inEvents[k - 1].getData(2)+":"+inEvents[k - 1].getData(3)+",");
+                    coordinates.add(new Location(String.valueOf(inEvents[k - 1].getData(2)),String.valueOf(inEvents[k - 1].getData(3))));
+                }
             }
         });
     }
@@ -220,24 +246,30 @@ public class WeatherAlerts {
                 BoundaryEvent event = new BoundaryEvent(this, output);
                 //add the code to notify the event lister
 
+                //invokes the listener to detect the filtered coordinates
                 listener.handelBoundaryEvent(event);
+                AlertEvent eventt = new AlertEvent(this, coordinates);
+                listener.handleAlertEvent(eventt);
+
+                //resets the values
+                coordinates=new ArrayList<>();
+                coordString=new StringBuilder();
             }
         });
     }
 
     //sends the data filtered as a string composed with location coordinates
-    public void sendFilteredWeatherData() {
-        String calBoundary = siddhiManager.addQuery("from FilteredDataStream #window.timeBatch( " + CEPEnvironment.TIME_GAP + " min ) " +
-                "select weather:coordinates(latitude,longitude) as coordinates " +
-                "insert into CheckBatch for all-events ; ");
-
-        siddhiManager.addCallback(calBoundary, new QueryCallback() {
-            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-                AlertEvent event = new AlertEvent(this, CEPEnvironment.COORDINATE_FILE_PATH);
-                listener.handleAlertEvent(event);
-            }
-        });
-    }
-
+//    public void sendFilteredWeatherData() {
+//        String calBoundary = siddhiManager.addQuery("from FilteredDataStream #window.timeBatch( " + CEPEnvironment.TIME_GAP + " min ) " +
+//                "select weather:coordinates(latitude,longitude) as coordinates " +
+//                "insert into CheckBatch for all-events ; ");
+//
+//        siddhiManager.addCallback(calBoundary, new QueryCallback() {
+//            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
+//                AlertEvent event = new AlertEvent(this, CEPEnvironment.COORDINATE_FILE_PATH);
+//                listener.handleAlertEvent(event);
+//            }
+//        });
+//    }
 
 }
