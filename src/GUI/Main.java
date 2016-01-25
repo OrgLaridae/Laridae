@@ -167,13 +167,12 @@ public class Main extends JFrame {
             System.out.println("Lat : " + lat1 + " " + lat2);
             createBoundery(MLBoundLayer, attributes, upperLeft, lowerRight, "ML boundary");
         }
-        runWRF(boundaryArray);
     }
 
     private void runWRF(ArrayList<Boundary> boundaryArray) {
         WRFEnvironment wrfEnvironment=new WRFEnvironment();
         long start=System.currentTimeMillis();
-        //for (int i = 0; i < boundaryArray.size(); i++) {
+        for (int i = 0; i < boundaryArray.size(); i++) {
             boundary = boundaryArray.get(0);
             System.out.println(boundary.getMinLatitude()+" "+boundary.getMaxLatitude()+" "+boundary.getMinLongitude()+" "+boundary.getMaxLongitude());
             wrfEnvironment.setE_sn(String.valueOf(NamelistCalc.get_e_ns(boundary,wrfEnvironment.getResolution())));
@@ -189,7 +188,7 @@ public class Main extends JFrame {
 
             //run the WRF using the shell scripts
             runScript.runScript("sh /home/ruveni/IdeaProjects/Laridae/src/WRF/autoauto.sh");
-        //}
+        }
         long end=System.currentTimeMillis();
         double diff=(end-start)/1000.0;
         System.out.println("Time : "+diff);
