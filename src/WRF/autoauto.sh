@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #set the path to automated.sh
-AUTO_PATH="/home/ruveni/IdeaProjects/DataAgent/src/main/java/org/mora/cep/AutomateWRF";
+AUTO_PATH="/home/ruveni/IdeaProjects/Laridae/src/WRF";
 
 START=$(date +%s);
 

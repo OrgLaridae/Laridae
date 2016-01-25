@@ -12,12 +12,12 @@
 START=$(date +%s);
 
 #set paths to following directories
-WRF_PATH="/home/ruveni/WRF/AutomatedScripts/WRFV3";
-WPS_PATH="/home/ruveni/WRF/AutomatedScripts/WPS";
-WRF_EMREAL_PATH="/home/ruveni/WRF/AutomatedScripts/WRFV3/test/em_real";
+WRF_PATH="/home/ruveni/Data/TestWRF/WRFV3";
+WPS_PATH="/home/ruveni/Data/TestWRF/WPS";
+WRF_EMREAL_PATH="/home/ruveni/Data/TestWRF/WRFV3/test/em_real";
 
 #set path to data
-WRF_DATA="/home/ruveni/WRF/AutomatedScripts/WPS/ungrib/Dakota/";
+WRF_DATA="/home/ruveni/Data/TestWRF/WPS/ungrib/Colorado/";
 
 START=$(date +%s);
 
@@ -37,7 +37,7 @@ echo "Running geogrid.exe";
 
 #WPS ungrib
 echo "linking Vtable";
-ln -sf ungrib/Variable_Tables/Vtable.GFS Vtable;
+ln -sf ungrib/Variable_Tables/Vtable.NAM Vtable;
 
 echo "linking data path";
 #./link_grib.csh /home/chamil/Playground/WPS/ungrib/Colorado/;

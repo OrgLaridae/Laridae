@@ -1,11 +1,14 @@
 package GUI;
 
-import CEP.cepProcessing.CEPEnvironment;
 import CEP.customEvents.AlertEvent;
+import CEP.customEvents.Boundary;
 import CEP.customEvents.BoundaryEvent;
 import CEP.customEvents.Location;
 import CEP.main.CEP;
 import ML.KMeansClass;
+import WRF.NamelistCalc;
+import WRF.RunScript;
+import WRF.WRFEnvironment;
 import gov.nasa.worldwind.*;
 import gov.nasa.worldwind.avlist.AVKey;
 import gov.nasa.worldwind.awt.WorldWindowGLCanvas;
@@ -23,11 +26,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.spark.mllib.linalg.Vector;
 import org.apache.spark.mllib.linalg.Vectors;
@@ -55,6 +54,9 @@ public class Main extends JFrame {
 
 
     ArrayList<Vector> dataPoints;
+    ArrayList<Boundary> boundaryArray;
+    Boundary boundary;
+    RunScript runScript;
     //ShapeAttributes normalAttributes;
 
     public Main() {
@@ -146,6 +148,7 @@ public class Main extends JFrame {
     }
 
     private void runML() {
+        boundaryArray = new ArrayList<>();
         ArrayList<Vector>[] clusters = KMeansClass.run(dataPoints, 20, 1);
 
         for (int i = 0; i < clusters.length; i++) {
@@ -156,21 +159,44 @@ public class Main extends JFrame {
             double lon2 = bounds[1].apply(1) - 180;
 
             ShapeAttributes attributes = configureBounderyAttributes(Material.ORANGE, Material.ORANGE);
+            boundaryArray.add(new Boundary(lat1, lat2, lon1, lon2));
 
             LatLon upperLeft = LatLon.fromDegrees(lat1, lon1);
             LatLon lowerRight = LatLon.fromDegrees(lat2, lon2);
-            System.out.println("Lon : "+lon1+" "+lon2);
-            System.out.println("Lat : "+lat1+" "+lat2);
+            System.out.println("Lon : " + lon1 + " " + lon2);
+            System.out.println("Lat : " + lat1 + " " + lat2);
             createBoundery(MLBoundLayer, attributes, upperLeft, lowerRight, "ML boundary");
         }
+        runWRF(boundaryArray);
     }
 
-    private void runWRF() {
+    private void runWRF(ArrayList<Boundary> boundaryArray) {
+        WRFEnvironment wrfEnvironment=new WRFEnvironment();
+        long start=System.currentTimeMillis();
+        //for (int i = 0; i < boundaryArray.size(); i++) {
+            boundary = boundaryArray.get(0);
+            System.out.println(boundary.getMinLatitude()+" "+boundary.getMaxLatitude()+" "+boundary.getMinLongitude()+" "+boundary.getMaxLongitude());
+            wrfEnvironment.setE_sn(String.valueOf(NamelistCalc.get_e_ns(boundary,wrfEnvironment.getResolution())));
+            wrfEnvironment.setE_we(String.valueOf(NamelistCalc.get_e_we(boundary,wrfEnvironment.getResolution())));
+            wrfEnvironment.setRef_lat(NamelistCalc.get_refLat(boundary));
+            wrfEnvironment.setRef_lon(NamelistCalc.get_refLon(boundary));
 
+            runScript = new RunScript();
+
+            //initially change the namelist.wps and namelist.input files according to the parameters set
+            runScript.changeNamelistWPS(wrfEnvironment.getInputWPSPath(),wrfEnvironment.getStartDate(),wrfEnvironment.getEndDate(),wrfEnvironment.getMaxDom(),wrfEnvironment.getIntervalSeconds(),wrfEnvironment.getE_we(),wrfEnvironment.getE_sn(),wrfEnvironment.getGeo_data_path(),wrfEnvironment.getPrefix(),wrfEnvironment.getRef_lat(),wrfEnvironment.getRef_lon());
+            runScript.changeNamelipsInput(wrfEnvironment.getNamelistWRFPath(),wrfEnvironment.getRunDays(),wrfEnvironment.getRunHours(),wrfEnvironment.getStartYear(),wrfEnvironment.getStartMonth(),wrfEnvironment.getStartDay(),wrfEnvironment.getStartHour(),wrfEnvironment.getEndYear(),wrfEnvironment.getEndMonth(),wrfEnvironment.getEndtDay(),wrfEnvironment.getEndHour(),wrfEnvironment.getIntervalSeconds(),wrfEnvironment.getMaxDom(),wrfEnvironment.getE_we(),wrfEnvironment.getE_sn(),wrfEnvironment.getNum_metgrid_levels(),wrfEnvironment.getNum_metgrid_soil_levels());
+
+            //run the WRF using the shell scripts
+            runScript.runScript("sh /home/ruveni/IdeaProjects/Laridae/src/WRF/autoauto.sh");
+        //}
+        long end=System.currentTimeMillis();
+        double diff=(end-start)/1000.0;
+        System.out.println("Time : "+diff);
     }
 
     public void handleAlertEvent(AlertEvent e) {
-        ArrayList<Location> array=e.getCoordinates();
+        ArrayList<Location> array = e.getCoordinates();
         dataPoints = new ArrayList<>();
         ShapeAttributes attributes;
 
@@ -297,7 +323,7 @@ public class Main extends JFrame {
         DataLoadButton.addActionListener(e -> loadData());
         CEPButton.addActionListener(e -> runCEP());
         MLButton.addActionListener(e -> runML());
-        WRFButton.addActionListener(e -> runWRF());
+        WRFButton.addActionListener(e -> runWRF(boundaryArray));
 
         try {
             BufferedImage image = ImageIO.read(new File("resources/arrow.png"));

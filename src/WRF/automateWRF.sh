@@ -12,16 +12,18 @@
 START=$(date +%s);
 
 #set paths to following directories
-WRF_PATH="/home/ruveni/WRF/AutomatedScripts/WRFV3";
-WPS_PATH="/home/ruveni/WRF/AutomatedScripts/WPS";
-WRF_EMREAL_PATH="/home/ruveni/WRF/AutomatedScripts/WRFV3/test/em_real";
+WRF_PATH="/home/ruveni/Data/TestWRF/WRFV3";
+WPS_PATH="/home/ruveni/Data/TestWRF/WPS";
+WRF_EMREAL_PATH="/home/ruveni/Data/TestWRF/WRFV3/test/em_real";
 
 #set path to data
-WRF_DATA="/home/ruveni/WRF/AutomatedScripts/WPS/ungrib/Dakota/";
+WRF_DATA="/home/ruveni/Data/TestWRF/WPS/ungrib/Colorado/";
 
 
 #WRF Model initial
 echo "Navigating to WRF root";
+echo $WRF_PATH;
+
 #cd /home/chamil/Playground/WRFV3;
 cd $WRF_PATH;
 ls;
