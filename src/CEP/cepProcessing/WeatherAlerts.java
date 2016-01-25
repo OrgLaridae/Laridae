@@ -237,23 +237,29 @@ public class WeatherAlerts {
 
         siddhiManager.addCallback(calBoundary, new QueryCallback() {
             public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-                int k = inEvents.length;
-                System.out.print("Resulting Boundary : ");
-                //format minLat maxLat minLon maxLon
-                //Eg Resulting Boundary : 53.915516 59.833235 -148.537948 -54.56872
-                String output = inEvents[k - 1].getData(0) + " " + inEvents[k - 1].getData(1) + " " + inEvents[k - 1].getData(2) + " " + inEvents[k - 1].getData(3);
-                System.out.println(inEvents[k - 1].getData(0) + " " + inEvents[k - 1].getData(1) + " " + inEvents[k - 1].getData(2) + " " + inEvents[k - 1].getData(3));
-                BoundaryEvent event = new BoundaryEvent(this, output);
-                //add the code to notify the event lister
+                try{
+                    int k = inEvents.length;
+                    System.out.print("Resulting Boundary : ");
+                    //format minLat maxLat minLon maxLon
+                    //Eg Resulting Boundary : 53.915516 59.833235 -148.537948 -54.56872
+                    String output = inEvents[k - 1].getData(0) + " " + inEvents[k - 1].getData(1) + " " + inEvents[k - 1].getData(2) + " " + inEvents[k - 1].getData(3);
+                    System.out.println(inEvents[k - 1].getData(0) + " " + inEvents[k - 1].getData(1) + " " + inEvents[k - 1].getData(2) + " " + inEvents[k - 1].getData(3));
+                    BoundaryEvent event = new BoundaryEvent(this, output);
+                    //add the code to notify the event lister
 
-                //invokes the listener to detect the filtered coordinates
-                listener.handelBoundaryEvent(event);
-                AlertEvent eventt = new AlertEvent(this, coordinates);
-                listener.handleAlertEvent(eventt);
+                    //invokes the listener to detect the filtered coordinates
+                    listener.handelBoundaryEvent(event);
+                    AlertEvent eventt = new AlertEvent(this, coordinates);
+                    listener.handleAlertEvent(eventt);
 
-                //resets the values
-                coordinates=new ArrayList<>();
-                coordString=new StringBuilder();
+                    //resets the values
+                    coordinates=new ArrayList<>();
+                    coordString=new StringBuilder();
+                }catch (Exception e){
+                    //null pointer exception
+                    //no data to process for CEP
+                }
+
             }
         });
     }
