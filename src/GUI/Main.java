@@ -57,6 +57,11 @@ public class Main extends JFrame {
     ArrayList<Boundary> boundaryArray;
     Boundary boundary;
     RunScript runScript;
+    private double cepTime=0;
+    private double mlTime=0;
+    private double wrfTime=0;
+    private long cepStart=0;
+    private long cepEnd=0;
     //ShapeAttributes normalAttributes;
 
     public Main() {
@@ -143,11 +148,11 @@ public class Main extends JFrame {
     }
 
     private void runCEP() {
-
         CEP.run(this);
     }
 
     private void runML() {
+        long start=System.currentTimeMillis();
         boundaryArray = new ArrayList<>();
         ArrayList<Vector>[] clusters = KMeansClass.run(dataPoints, 20, 1);
 
@@ -167,13 +172,16 @@ public class Main extends JFrame {
             System.out.println("Lat : " + lat1 + " " + lat2);
             createBoundery(MLBoundLayer, attributes, upperLeft, lowerRight, "ML boundary");
         }
+        MLButton.setEnabled(false);
+        long end=System.currentTimeMillis();
+        mlTime=(end-start)/1000.0;
     }
 
     private void runWRF(ArrayList<Boundary> boundaryArray) {
         WRFEnvironment wrfEnvironment=new WRFEnvironment();
         long start=System.currentTimeMillis();
         for (int i = 0; i < boundaryArray.size(); i++) {
-            boundary = boundaryArray.get(0);
+            boundary = boundaryArray.get(i);
             System.out.println(boundary.getMinLatitude()+" "+boundary.getMaxLatitude()+" "+boundary.getMinLongitude()+" "+boundary.getMaxLongitude());
             wrfEnvironment.setE_sn(String.valueOf(NamelistCalc.get_e_ns(boundary,wrfEnvironment.getResolution())));
             wrfEnvironment.setE_we(String.valueOf(NamelistCalc.get_e_we(boundary,wrfEnvironment.getResolution())));
@@ -190,11 +198,16 @@ public class Main extends JFrame {
             runScript.runScript("sh /home/ruveni/IdeaProjects/Laridae/src/WRF/autoauto.sh");
         }
         long end=System.currentTimeMillis();
-        double diff=(end-start)/1000.0;
-        System.out.println("Time : "+diff);
+        wrfTime=(end-start)/1000.0;
+        System.out.println("CEP Time : "+cepTime+" seconds");
+        System.out.println("ML Time : "+mlTime+" seconds");
+        System.out.println("WRF Time : "+wrfTime+" seconds");
+
+        System.out.println("Total Time : "+(cepTime+mlTime+wrfTime)+" seconds");
     }
 
     public void handleAlertEvent(AlertEvent e) {
+        cepStart=System.currentTimeMillis();
         ArrayList<Location> array = e.getCoordinates();
         dataPoints = new ArrayList<>();
         ShapeAttributes attributes;
@@ -211,6 +224,9 @@ public class Main extends JFrame {
 
             dataPoints.add(Vectors.dense(lonPositive, latPositive));
         }
+        cepEnd=System.currentTimeMillis();
+        cepTime=(Math.abs(cepStart-cepEnd))/1000.0;
+        CEPButton.setEnabled(false);
 //        System.out.println(dataPoints.size());
 
 //        String string = e.getCoordinates();
@@ -230,8 +246,6 @@ public class Main extends JFrame {
 //            double lonPositive = lon+180;
 //            dataPoints.add(Vectors.dense(lonPositive, latPositive));
 //        }
-
-        CEPButton.setEnabled(false);
     }
 
     public void handelBoundaryEvent(BoundaryEvent e) {
