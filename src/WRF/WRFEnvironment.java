@@ -9,12 +9,12 @@ public class WRFEnvironment {
     private String endDate="'2006-12-20_12:00:00'";
     private int maxDom=1;
     private long intervalSeconds=10800;
-    private String e_we="75";
-    private String e_sn="70";
+    private String e_we="74";
+    private String e_sn="61";
     private String geo_data_path="/home/ruveni/Data/TestWRF/WPS/geogrid/Data/geog_minimum";
     private String prefix="FILE";//default FILE
-    private double ref_lat=12.19;
-    private double ref_lon=78.06;
+    private double ref_lat=39.00;
+    private double ref_lon=-105.00;
 
     //namelist.input parameters to be changed
     private String namelistWRFPath="/home/ruveni/Data/TestWRF/WRFV3/test/em_real/namelist.input";
