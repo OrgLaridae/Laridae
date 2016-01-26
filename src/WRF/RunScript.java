@@ -93,37 +93,37 @@ public class RunScript {
             //changes the parameters
             for (int i = 0; i < namelistArray.length; i++) {
                 if (namelistArray[i].contains("max_dom")) {
-                    namelistArray[i] = "max_dom = "+maxDom+",";
+                    namelistArray[i] = " max_dom = "+maxDom+",";
                 } else if (namelistArray[i].contains("interval_seconds")) {
-                    namelistArray[i] = "interval_seconds = "+intervalSeconds+",";
+                    namelistArray[i] = " interval_seconds = "+intervalSeconds+",";
                 } else if (namelistArray[i].contains("e_we")) {
-                    namelistArray[i] = "e_we              =  "+e_we+",";
+                    namelistArray[i] = " e_we              =  "+e_we+",";
                 } else if (namelistArray[i].contains("e_sn")) {
-                    namelistArray[i] = "e_sn              =  "+e_sn+",";
+                    namelistArray[i] = " e_sn              =  "+e_sn+",";
                 } else if(namelistArray[i].contains("run_days")){
-                    namelistArray[i] = "run_days                            = "+runDays+",";
+                    namelistArray[i] = " run_days                            = "+runDays+",";
                 }else if(namelistArray[i].contains("run_hours")){
-                    namelistArray[i] = "run_hours                            = "+runHours+",";
+                    namelistArray[i] = " run_hours                            = "+runHours+",";
                 }else if(namelistArray[i].contains("start_year")){
-                    namelistArray[i] = "start_year                            = "+startYear+",";
+                    namelistArray[i] = " start_year                            = "+startYear+",";
                 }else if(namelistArray[i].contains("start_month")){
-                    namelistArray[i] = "start_month                            = "+startMonth+",";
+                    namelistArray[i] = " start_month                            = "+startMonth+",";
                 }else if(namelistArray[i].contains("start_day")){
-                    namelistArray[i] = "start_day                            = "+startDay+",";
+                    namelistArray[i] = " start_day                            = "+startDay+",";
                 }else if(namelistArray[i].contains("start_hour")){
-                    namelistArray[i] = "start_hour                            = "+startHour+",";
+                    namelistArray[i] = " start_hour                            = "+startHour+",";
                 }else if(namelistArray[i].contains("end_year")){
-                    namelistArray[i] = "end_year                            = "+endYear+",";
+                    namelistArray[i] = " end_year                            = "+endYear+",";
                 }else if(namelistArray[i].contains("end_month")){
-                    namelistArray[i] = "end_month                            = "+endMonth+",";
+                    namelistArray[i] = " end_month                            = "+endMonth+",";
                 }else if(namelistArray[i].contains("end_day")){
-                    namelistArray[i] = "end_day                            = "+endDay+",";
+                    namelistArray[i] = " end_day                            = "+endDay+",";
                 }else if(namelistArray[i].contains("end_hour")){
-                    namelistArray[i] = "end_hour                            = "+endHour+",";
+                    namelistArray[i] = " end_hour                            = "+endHour+",";
                 }else if(namelistArray[i].contains("num_metgrid_levels")){
-                    namelistArray[i] = "num_metgrid_levels                            = "+num_metgrid_levels+",";
+                    namelistArray[i] = " num_metgrid_levels                            = "+num_metgrid_levels+",";
                 }else if(namelistArray[i].contains("num_metgrid_soil_levels")){
-                    namelistArray[i] = "num_metgrid_soil_levels                            = "+num_metgrid_soil_levels+",";
+                    namelistArray[i] = " num_metgrid_soil_levels                            = "+num_metgrid_soil_levels+",";
                 }
                 //writes the data to the file
                 fw.write(namelistArray[i] + "\n");
