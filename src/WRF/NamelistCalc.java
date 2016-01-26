@@ -2,6 +2,9 @@ package WRF;
 
 import CEP.customEvents.Boundary;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+
 /**
  * Created by ruveni on 1/25/16.
  */
@@ -15,13 +18,19 @@ public class NamelistCalc{
 
     public static double get_refLat(Boundary boundary){
         //Assuming that boundryString is in the form lat_upper,lat_lower,lon_east, lon_west
-        return (boundary.getMinLatitude()+boundary.getMaxLatitude())/2;
+        double result=(boundary.getMinLatitude()+boundary.getMaxLatitude())/2;
+        DecimalFormat df = new DecimalFormat("#.##");
+        df.setRoundingMode(RoundingMode.CEILING);
+        return Double.parseDouble(df.format(result));
 
     }
 
     public static double get_refLon(Boundary boundary){
         //Assuming that boundryString is in the form lat_upper,lat_lower,lon_east, lon_west
-        return (boundary.getMinLongitude()+boundary.getMaxLongitude())/2;
+        double result=(boundary.getMinLongitude()+boundary.getMaxLongitude())/2;
+        DecimalFormat df = new DecimalFormat("#.##");
+        df.setRoundingMode(RoundingMode.CEILING);
+        return Double.parseDouble(df.format(result));
     }
 
     public static int get_e_we(Boundary boundary, int resolution_km){
@@ -43,7 +52,7 @@ public class NamelistCalc{
 
     public static int get_e_ns(Boundary boundary, int resolution_km){
         //Calculating lattitude gap
-        double gap = Math.abs(boundary.getMinLatitude()-boundary.getMaxLongitude());
+        double gap = Math.abs(boundary.getMinLatitude()-boundary.getMaxLatitude());
 
         //converting to meters
         double distance = gap*Meters_per_lon;
