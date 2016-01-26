@@ -148,6 +148,7 @@ public class Main extends JFrame {
     }
 
     private void runCEP() {
+        cepStart=System.currentTimeMillis();
         CEP.run(this);
     }
 
@@ -207,7 +208,6 @@ public class Main extends JFrame {
     }
 
     public void handleAlertEvent(AlertEvent e) {
-        cepStart=System.currentTimeMillis();
         ArrayList<Location> array = e.getCoordinates();
         dataPoints = new ArrayList<>();
         ShapeAttributes attributes;
@@ -224,9 +224,6 @@ public class Main extends JFrame {
 
             dataPoints.add(Vectors.dense(lonPositive, latPositive));
         }
-        cepEnd=System.currentTimeMillis();
-        cepTime=(Math.abs(cepStart-cepEnd))/1000.0;
-        CEPButton.setEnabled(false);
 //        System.out.println(dataPoints.size());
 
 //        String string = e.getCoordinates();
@@ -246,6 +243,9 @@ public class Main extends JFrame {
 //            double lonPositive = lon+180;
 //            dataPoints.add(Vectors.dense(lonPositive, latPositive));
 //        }
+        cepEnd=System.currentTimeMillis();
+        cepTime=(Math.abs(cepStart-cepEnd))/1000.0;
+        CEPButton.setEnabled(false);
     }
 
     public void handelBoundaryEvent(BoundaryEvent e) {
