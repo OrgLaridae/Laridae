@@ -73,7 +73,7 @@ public class WeatherAlerts {
         siddhiManager.addCallback(checkIndex, new QueryCallback() {
             public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
                 int k = inEvents.length;
-                System.out.println("Lifted Index : " + inEvents[k - 1].getData(1));
+                //System.out.println("Lifted Index : " + inEvents[k - 1].getData(1));
 
                 //adds the filtered coordinate to the array list
                 if(coordString.indexOf(inEvents[k - 1].getData(2)+":"+inEvents[k - 1].getData(3))<0){
@@ -100,7 +100,7 @@ public class WeatherAlerts {
         siddhiManager.addCallback(checkIndex, new QueryCallback() {
             public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
                 int k = inEvents.length;
-                System.out.println("Helicity Index : " + inEvents[k - 1].getData(1));
+                //System.out.println("Helicity Index : " + inEvents[k - 1].getData(1));
 
                 //adds the filtered coordinate to the array list
                 if(coordString.indexOf(inEvents[k - 1].getData(2)+":"+inEvents[k - 1].getData(3))<0){
@@ -127,7 +127,7 @@ public class WeatherAlerts {
         siddhiManager.addCallback(checkIndex, new QueryCallback() {
             public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
                 int k = inEvents.length;
-                System.out.println("Inhibition Index : " + inEvents[k - 1].getData(1));
+                //System.out.println("Inhibition Index : " + inEvents[k - 1].getData(1));
 
                 //adds the filtered coordinate to the array list
                 if(coordString.indexOf(inEvents[k - 1].getData(2)+":"+inEvents[k - 1].getData(3))<0){
@@ -231,7 +231,7 @@ public class WeatherAlerts {
 
     //calculate the common boundary
     public void calculateCommonBoundary() {
-        String calBoundary = siddhiManager.addQuery("from FilteredDataStream #window.timeBatch( " + CEPEnvironment.TIME_GAP + " min ) " +
+        String calBoundary = siddhiManager.addQuery("from FilteredDataStream #window.timeBatch( " + CEPEnvironment.TIME_GAP + " sec ) " +
                 "select min(latitude) as minLatitude, max(latitude) as maxLatitude, min(longitude) as minLongitude, max(longitude) as maxLongitude, count(stationId) as dataCount " +
                 "insert into DataBoundary for all-events ; ");
 
