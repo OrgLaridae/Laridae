@@ -55,6 +55,7 @@ public class Main extends JFrame {
 
     ArrayList<Vector> dataPoints;
     ArrayList<Boundary> boundaryArray;
+    ArrayList<Double> clusterTimeArray;
     Boundary boundary;
     RunScript runScript;
     private double cepTime=0;
@@ -179,9 +180,11 @@ public class Main extends JFrame {
     }
 
     private void runWRF(ArrayList<Boundary> boundaryArray) {
+        clusterTimeArray=new ArrayList<>();
         WRFEnvironment wrfEnvironment=new WRFEnvironment();
         long start=System.currentTimeMillis();
         for (int i = 0; i < boundaryArray.size(); i++) {
+            long startCluster=System.currentTimeMillis();
             boundary = boundaryArray.get(i);
             System.out.println(boundary.getMinLatitude()+" "+boundary.getMaxLatitude()+" "+boundary.getMinLongitude()+" "+boundary.getMaxLongitude());
             wrfEnvironment.setE_sn(String.valueOf(NamelistCalc.get_e_ns(boundary,wrfEnvironment.getResolution())));
@@ -197,12 +200,18 @@ public class Main extends JFrame {
 
             //run the WRF using the shell scripts
             runScript.runScript("sh /home/ruveni/IdeaProjects/Laridae/src/WRF/autoauto.sh");
+            long endCluster=System.currentTimeMillis();
+            double clusterTime=(endCluster-startCluster)/1000.0;
+            clusterTimeArray.add(clusterTime);
         }
         long end=System.currentTimeMillis();
         wrfTime=(end-start)/1000.0;
         System.out.println("CEP Time : "+cepTime+" seconds");
         System.out.println("ML Time : "+mlTime+" seconds");
         System.out.println("WRF Time : "+wrfTime+" seconds");
+        for(int i=0;i<clusterTimeArray.size();i++){
+            System.out.println("Cluster "+(i+1)+" : "+clusterTimeArray.get(i));
+        }
 
         System.out.println("Total Time : "+(cepTime+mlTime+wrfTime)+" seconds");
     }
