@@ -1,2 +1,2 @@
 # Laridae
-Laridae : Complex Event Processing Based Weather Monitoring System
+Complex Event Processing Based Weather Monitoring System
