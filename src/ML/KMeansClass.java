@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 
 public class KMeansClass {
 
+    static double epsilon = 0.000001;
 
 //    private static class ParsePoint implements FlatMapFunction<String, Vector> {
 //
@@ -87,16 +88,21 @@ public class KMeansClass {
 
     public static ArrayList<Vector>[] run(ArrayList<Vector> vals, int iterations, int runs) {
 
+        int find_f_iterations = 10;
+        int find_f_runs = 1;
 
 
         SparkConf sparkConf = new SparkConf().setAppName("JavaKMeans").setMaster("local");
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
         JavaRDD<Vector> points = sc.parallelize(vals);
 
-        int k = findK(points, iterations, runs);
+        int k = findK(points, find_f_iterations, find_f_runs);
 
+        //KMeansModel model = KMeans.train(points.rdd(), k, iterations, runs, KMeans.K_MEANS_PARALLEL());
+        KMeans kmeans = new KMeans();
+        kmeans = kmeans.setEpsilon(epsilon).setK(k).setMaxIterations(iterations).setRuns(runs).setInitializationMode(KMeans.K_MEANS_PARALLEL());
 
-        KMeansModel model = KMeans.train(points.rdd(), k, iterations, runs, KMeans.K_MEANS_PARALLEL());
+        KMeansModel model = kmeans.run(points.rdd());
         JavaRDD<Integer> values = model.predict(points);
 
 
@@ -161,13 +167,17 @@ public class KMeansClass {
 
 
         for (int k = 1;  k < kMax; k++) {
-            model = KMeans.train(points.rdd(), k, iterations, runs, KMeans.K_MEANS_PARALLEL());
+            KMeans kmeans = new KMeans();
+            kmeans = kmeans.setEpsilon(epsilon).setK(k).setMaxIterations(iterations).setRuns(runs).setInitializationMode(KMeans.K_MEANS_PARALLEL());
+
+            model = kmeans.run(points.rdd());
+            //model = KMeans.train(points.rdd(), k, iterations, runs, KMeans.K_MEANS_PARALLEL());
             JavaRDD<Integer> values = model.predict(points);
             Sk = findSk(k, model, values, points);
             ak = findak(k, dimensions, ak_1);
             Fk = findFk(k, Sk, Sk_1, ak);
 
-            if(Fk < 0.89){
+            if(Fk < 0.85){
                 return k;
             }
             Sk_1 = Sk;
