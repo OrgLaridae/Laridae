@@ -14,7 +14,7 @@ import org.wso2.siddhi.query.api.extension.annotation.SiddhiExtension;
 //latitudes and longitude values of two different stations are passed as parameters
 //calculates the distance in between the two points
 //checks the calculated distance is more than a defined threshold value
-@SiddhiExtension(namespace = "madis", function = "isNearStation")
+@SiddhiExtension(namespace = "weather", function = "isNearStation")
 public class IsNearStation extends FunctionExecutor {
     Attribute.Type returnType;
     private double latA = 0, lonA = 0, latB = 0, lonB = 0, dLat = 0, dLng = 0, a = 0, c = 0, dist = 0;
