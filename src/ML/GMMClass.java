@@ -34,7 +34,7 @@ public class GMMClass {
         int k = findK(points);//KMeansClass.findK(points, find_f_iterations, find_f_runs);;//findK(points);
 
         //int k =10;
-        GaussianMixtureModel gmm = new GaussianMixture().setK(k).setConvergenceTol(0.0001).run(points.rdd());
+        GaussianMixtureModel gmm = new GaussianMixture().setK(k).setConvergenceTol(1).run(points.rdd());
         JavaRDD<Integer> values = gmm.predict(points);//.toJavaRDD().map(o -> (Integer)o);
 
         ArrayList<Vector>[] clusters = new ArrayList[k];
@@ -61,7 +61,7 @@ public class GMMClass {
     public static int findK(JavaRDD<Vector> points){
         int bestk = 0;
         double bestBIC = Double.MAX_VALUE;
-        int kMax = 10;//(int)Math.sqrt(points.count());
+        int kMax = 15;//(int)Math.sqrt(points.count());
         ArrayList<Double> BICs = new ArrayList<>();
         for (int k = 1;  k < kMax; k++) {
             double bic = BIC(points, k);
@@ -76,7 +76,7 @@ public class GMMClass {
     }
 
     public static double BIC(JavaRDD<Vector> points, int k){
-        GaussianMixtureModel gmm = new GaussianMixture().setK(k).setConvergenceTol(0.0001).run(points.rdd());
+        GaussianMixtureModel gmm = new GaussianMixture().setK(k).setConvergenceTol(1).run(points.rdd());
 
         //double sumLogWeight = 0;
 
