@@ -5,6 +5,7 @@ import CEP.customEvents.Boundary;
 import CEP.customEvents.BoundaryEvent;
 import CEP.customEvents.Location;
 import CEP.main.CEP;
+import ML.GMMClass;
 import ML.KMeansClass;
 import WRF.NamelistCalc;
 import WRF.RunScript;
@@ -156,7 +157,8 @@ public class Main extends JFrame {
     private void runML() {
         long start=System.currentTimeMillis();
         boundaryArray = new ArrayList<>();
-        ArrayList<Vector>[] clusters = KMeansClass.run(dataPoints, 20, 1);
+        ArrayList<Vector>[] clusters = GMMClass.run(dataPoints);
+        //ArrayList<Vector>[] clusters = KMeansClass.run(dataPoints, 20, 1);
 
         for (int i = 0; i < clusters.length; i++) {
             Vector[] bounds = KMeansClass.getBounds(clusters[i], 360, 180);
@@ -199,7 +201,7 @@ public class Main extends JFrame {
             runScript.changeNamelipsInput(wrfEnvironment.getNamelistWRFPath(),wrfEnvironment.getRunDays(),wrfEnvironment.getRunHours(),wrfEnvironment.getStartYear(),wrfEnvironment.getStartMonth(),wrfEnvironment.getStartDay(),wrfEnvironment.getStartHour(),wrfEnvironment.getEndYear(),wrfEnvironment.getEndMonth(),wrfEnvironment.getEndtDay(),wrfEnvironment.getEndHour(),wrfEnvironment.getIntervalSeconds(),wrfEnvironment.getMaxDom(),wrfEnvironment.getE_we(),wrfEnvironment.getE_sn(),wrfEnvironment.getNum_metgrid_levels(),wrfEnvironment.getNum_metgrid_soil_levels());
 
             //run the WRF using the shell scripts
-            runScript.runScript("sh /home/ruveni/IdeaProjects/Laridae/src/WRF/autoauto.sh");
+            runScript.runScript("sh /Users/vidu/Documents/Development/Final_Year_Project/Development/Laridae/src/WRF/autoauto.sh");
             long endCluster=System.currentTimeMillis();
             double clusterTime=(endCluster-startCluster)/1000.0;
             clusterTimeArray.add(clusterTime);
