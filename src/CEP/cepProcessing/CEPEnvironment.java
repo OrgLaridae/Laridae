@@ -4,7 +4,7 @@ package CEP.cepProcessing;
  * Created by ruveni on 1/21/16.
  */
 public class CEPEnvironment {
-    public static final int TIME_GAP = 8; //in seconds
+    public static final int TIME_GAP = 15; //in seconds
     public static final int THRESHOLD_LIFTED_INDEX=-1;
     public static final int THRESHOLD_HELICITY=150;
     public static final int THRESHOLD_INHIBITION=-50;
