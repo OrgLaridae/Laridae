@@ -15,6 +15,12 @@ public class WRFEnvironment {
     private String prefix="FILE";//default FILE
     private double ref_lat=39.00;
     private double ref_lon=-105.00;
+    private double pole_lat=0.0;
+    private double pole_lon=0.0;
+    private double stand_lon=0.0;
+    private String map_proj="lambert";
+    private double dx=30000;
+    private double dy=30000;
 
     //namelist.input parameters to be changed
     private String namelistWRFPath="/home/ruveni/Data/TestWRF/WRFV3/test/em_real/namelist.input";
@@ -32,7 +38,9 @@ public class WRFEnvironment {
     private int num_metgrid_levels=40;
     private int num_metgrid_soil_levels=4;
 
-    private int resolution=30;
+    private double resolution=30; //km
+
+    private String test_em_real_path="/home/ruveni/Data/TestWRF/WRFV3/test/em_real/";
 
 
     public String getInputWPSPath() {
@@ -227,11 +235,67 @@ public class WRFEnvironment {
         this.num_metgrid_soil_levels = num_metgrid_soil_levels;
     }
 
-    public int getResolution() {
+    public double getResolution() {
         return resolution;
     }
 
-    public void setResolution(int resolution) {
+    public void setResolution(double resolution) {
         this.resolution = resolution;
+    }
+
+    public double getPole_lat() {
+        return pole_lat;
+    }
+
+    public void setPole_lat(double pole_lat) {
+        this.pole_lat = pole_lat;
+    }
+
+    public double getPole_lon() {
+        return pole_lon;
+    }
+
+    public void setPole_lon(double pole_lon) {
+        this.pole_lon = pole_lon;
+    }
+
+    public double getStand_lon() {
+        return stand_lon;
+    }
+
+    public void setStand_lon(double stand_lon) {
+        this.stand_lon = stand_lon;
+    }
+
+    public String getMap_proj() {
+        return map_proj;
+    }
+
+    public void setMap_proj(String map_proj) {
+        this.map_proj = map_proj;
+    }
+
+    public String getTest_em_real_path() {
+        return test_em_real_path;
+    }
+
+    public void setTest_em_real_path(String test_em_real_path) {
+        this.test_em_real_path = test_em_real_path;
+    }
+
+    public double getDx() {
+        return dx;
+    }
+
+    public void setDx(double dx) {
+        this.dx = dx;
+    }
+
+    public double getDy() {
+        return dy;
+    }
+
+    public void setDy(double dy) {
+        this.dy = dy;
     }
 }

@@ -13,8 +13,8 @@ import java.text.DecimalFormat;
 
 public class NamelistCalc{
 
-    static double Meters_per_lat = 110.57;
-    static double Meters_per_lon = 111.32;
+    static double distance_per_lat_km = 110.57;
+    static double distance_per_lon_km = 111.32;
 
     public static double get_refLat(Boundary boundary){
         //Assuming that boundryString is in the form lat_upper,lat_lower,lon_east, lon_west
@@ -38,7 +38,7 @@ public class NamelistCalc{
         double gap = Math.abs(boundary.getMinLongitude()-boundary.getMaxLongitude());
 
         //converting to meters
-        double distance = gap*Meters_per_lat;
+        double distance = gap* distance_per_lat_km;
 
         //intermediate value
         double grid_units = distance/resolution_km;
@@ -55,7 +55,7 @@ public class NamelistCalc{
         double gap = Math.abs(boundary.getMinLatitude()-boundary.getMaxLatitude());
 
         //converting to meters
-        double distance = gap*Meters_per_lon;
+        double distance = gap* distance_per_lon_km;
 
         //intermediate value
         double grid_units = distance/resolution_km;
@@ -67,4 +67,30 @@ public class NamelistCalc{
         return (int)units;
     }
 
+    public static int get_e_ns_latlon(Boundary boundary, double resolution_deg){
+        double diff=(boundary.getMinLatitude()-boundary.getMaxLatitude());
+        double gap = Math.abs(diff);
+        return (int)Math.floor(gap/resolution_deg);
+    }
+
+    public static int get_e_we_latlon(Boundary boundary, double resolution_deg){
+        double diff=(boundary.getMaxLongitude()-boundary.getMinLongitude());
+        double gap = Math.abs(diff);
+        return (int)Math.floor(gap/resolution_deg);
+    }
+
+    public static double get_pole_lat(Boundary boundary) {
+        DecimalFormat df = new DecimalFormat("#.##");
+        df.setRoundingMode(RoundingMode.CEILING);
+        String val=df.format(90.0 - get_refLat(boundary));
+        return Double.parseDouble(val);
+    }
+
+    public static double get_pole_lon() {
+        return 180.0;
+    }
+
+    public static double get_standard_lon(Boundary boundary) {
+        return (get_refLon(boundary)*(-1));
+    }
 }
