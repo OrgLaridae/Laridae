@@ -14,5 +14,4 @@ public class Lambert_LatLon {
         return new double[]{latitude, longitude};
     }
 
-
 }
