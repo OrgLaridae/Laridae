@@ -45,7 +45,7 @@ public class RunScript {
 //    }
 
     //changes the namelist.wps property file according to the parameters set
-    public void changeNamelistWPS(String filePath, String startDate, String endDate, int maxDom, long intervalSeconds, String e_we, String e_sn, String geog_data_path,String prefix,double ref_lat,double ref_lon) {
+    public void changeNamelistWPS(String filePath, String startDate, String endDate, int maxDom, long intervalSeconds, String e_we, String e_sn, String geog_data_path,String prefix,double ref_lat,double ref_lon,double pole_lat,double pole_lon,double stand_lon, String map_proj,double dx, double dy) {
         try {
             FileWriter fw=new FileWriter(filePath);
             Stream<String> namelistContent = Files.lines(Paths.get("/home/ruveni/IdeaProjects/DataAgent/src/main/java/org/mora/cep/AutomateWRF/namelist.wps"));
@@ -85,7 +85,7 @@ public class RunScript {
     }
 
     //changes the namelist.input file according to the parameters set
-    public void changeNamelipsInput(String filePath, int runDays,int runHours, String startYear, String startMonth, String startDay, String startHour, String endYear, String endMonth, String endDay, String endHour, long intervalSeconds, int maxDom, String e_we, String e_sn, int num_metgrid_levels, int num_metgrid_soil_levels) {
+    public void changeNamelipsInput(String filePath, int runDays,int runHours, String startYear, String startMonth, String startDay, String startHour, String endYear, String endMonth, String endDay, String endHour, long intervalSeconds, int maxDom, String e_we, String e_sn, int num_metgrid_levels, int num_metgrid_soil_levels, double dx, double dy) {
         try {
             FileWriter fw=new FileWriter(filePath);
             Stream<String> namelistContent = Files.lines(Paths.get("/home/ruveni/IdeaProjects/DataAgent/src/main/java/org/mora/cep/AutomateWRF/namelist.input"));

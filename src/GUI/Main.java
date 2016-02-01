@@ -1,5 +1,6 @@
 package GUI;
 
+import CEP.cepProcessing.CEPEnvironment;
 import CEP.customEvents.AlertEvent;
 import CEP.customEvents.Boundary;
 import CEP.customEvents.BoundaryEvent;
@@ -27,7 +28,11 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.spark.mllib.linalg.Vector;
 import org.apache.spark.mllib.linalg.Vectors;
@@ -59,11 +64,13 @@ public class Main extends JFrame {
     ArrayList<Double> clusterTimeArray;
     Boundary boundary;
     RunScript runScript;
-    private double cepTime=0;
-    private double mlTime=0;
-    private double wrfTime=0;
-    private long cepStart=0;
-    private long cepEnd=0;
+    private double cepTime = 0;
+    private double mlTime = 0;
+    private double wrfTime = 0;
+    private long cepStart = 0;
+    private long cepEnd = 0;
+
+    String[] liftedArray;
     //ShapeAttributes normalAttributes;
 
     public Main() {
@@ -146,16 +153,32 @@ public class Main extends JFrame {
     }
 
     private void loadData() {
-        //createPoint();
+        String cvsSplitBy = ",";
+        String[] liftedData = null;
+
+        java.nio.file.Path liftedPath = Paths.get(CEPEnvironment.LIFTED_INDEX_FILE_PATH);
+        try {
+            Stream<String> liftedLines = Files.lines(liftedPath);
+            liftedArray = liftedLines.collect(Collectors.toList()).toArray(new String[0]);
+            for (int i = 1; i < liftedArray.length; i++) {
+                liftedData = liftedArray[i].split(cvsSplitBy);
+                ShapeAttributes attributes = configurePointAttributes(Material.CYAN);
+                createPoint(dataPointLayer, attributes, LatLon.fromDegrees(Double.parseDouble(liftedData[2]), Double.parseDouble(liftedData[3])));
+            }
+        } catch (IOException ex) {
+
+        }
+        DataLoadButton.setEnabled(false);
     }
 
     private void runCEP() {
-        cepStart=System.currentTimeMillis();
+        cepStart = System.currentTimeMillis();
+        CEPButton.setEnabled(false);
         CEP.run(this);
     }
 
     private void runML() {
-        long start=System.currentTimeMillis();
+        long start = System.currentTimeMillis();
         boundaryArray = new ArrayList<>();
         ArrayList<Vector>[] clusters = GMMClass.run(dataPoints);
         //ArrayList<Vector>[] clusters = KMeansClass.run(dataPoints, 20, 1);
@@ -177,45 +200,108 @@ public class Main extends JFrame {
             createBoundery(MLBoundLayer, attributes, upperLeft, lowerRight, "ML boundary");
         }
         MLButton.setEnabled(false);
-        long end=System.currentTimeMillis();
-        mlTime=(end-start)/1000.0;
+        long end = System.currentTimeMillis();
+        mlTime = (end - start) / 1000.0;
     }
 
     private void runWRF(ArrayList<Boundary> boundaryArray) {
-        clusterTimeArray=new ArrayList<>();
-        WRFEnvironment wrfEnvironment=new WRFEnvironment();
-        long start=System.currentTimeMillis();
+        clusterTimeArray = new ArrayList<>();
+        WRFEnvironment wrfEnvironment = new WRFEnvironment();
+        long start = System.currentTimeMillis();
         for (int i = 0; i < boundaryArray.size(); i++) {
-            long startCluster=System.currentTimeMillis();
+            long startCluster = System.currentTimeMillis();
             boundary = boundaryArray.get(i);
-            System.out.println(boundary.getMinLatitude()+" "+boundary.getMaxLatitude()+" "+boundary.getMinLongitude()+" "+boundary.getMaxLongitude());
-            wrfEnvironment.setE_sn(String.valueOf(NamelistCalc.get_e_ns(boundary,wrfEnvironment.getResolution())));
-            wrfEnvironment.setE_we(String.valueOf(NamelistCalc.get_e_we(boundary,wrfEnvironment.getResolution())));
+            //System.out.println(boundary.getMinLatitude()+" "+boundary.getMaxLatitude()+" "+boundary.getMinLongitude()+" "+boundary.getMaxLongitude());
             wrfEnvironment.setRef_lat(NamelistCalc.get_refLat(boundary));
             wrfEnvironment.setRef_lon(NamelistCalc.get_refLon(boundary));
+
+//            wrfEnvironment.setPole_lat(NamelistCalc.get_pole_lat(boundary));
+//            wrfEnvironment.setPole_lon(NamelistCalc.get_pole_lon());
+//            wrfEnvironment.setStand_lon(NamelistCalc.get_standard_lon(boundary));
+//            wrfEnvironment.setMap_proj("lat-lon");
+//            wrfEnvironment.setDx(0.26);//default : 30000
+//            wrfEnvironment.setDy(0.26);
+//            wrfEnvironment.setResolution(0.26);
+            wrfEnvironment.setE_sn(String.valueOf(NamelistCalc.get_e_ns(boundary, wrfEnvironment.getResolution())));
+            wrfEnvironment.setE_we(String.valueOf(NamelistCalc.get_e_we(boundary, wrfEnvironment.getResolution())));
+
+            /*
+            e_we = 74, 112,
+e_sn = 61, 97,
+geog_data_res = '10m','2m',
+dx = 0.15,
+dy = 0.15,
+map_proj = 'lat-lon',
+pole_lat = 90,
+pole_lon = 180,
+ref_lat = 53.5,
+ref_lon = -4.0,
+stand_lon = 0.0,
+
+dx = 0.2695,
+ dy = 0.2713,
+ map_proj = 'lat-lon',
+ ref_lat = 45.28,
+ ref_lon = -131.66,
+ truelat1  =  30.0,
+ truelat2  =  60.0,
+ stand_lon = 131.66,
+ pole_lat = 44.72,
+ pole_lon = 180.0,
+             */
+//            wrfEnvironment.setE_we("74");
+//            wrfEnvironment.setE_sn("61");
+//            wrfEnvironment.setDx(0.2695);
+//            wrfEnvironment.setDy(0.2695);
+//            wrfEnvironment.setMap_proj("lat-lon");
+//            wrfEnvironment.setPole_lat(44.72);
+//            wrfEnvironment.setPole_lon(180);
+//            wrfEnvironment.setRef_lat(45.28);
+//            wrfEnvironment.setRef_lon(-131.66);
+//            wrfEnvironment.setStand_lon(131.66);
+
+//            wrfEnvironment.setE_sn(String.valueOf(NamelistCalc.get_e_ns_latlon(boundary,wrfEnvironment.getResolution())));
+//            wrfEnvironment.setE_we(String.valueOf(NamelistCalc.get_e_we_latlon(boundary,wrfEnvironment.getResolution())));
+//
 
             runScript = new RunScript();
 
             //initially change the namelist.wps and namelist.input files according to the parameters set
-            runScript.changeNamelistWPS(wrfEnvironment.getInputWPSPath(),wrfEnvironment.getStartDate(),wrfEnvironment.getEndDate(),wrfEnvironment.getMaxDom(),wrfEnvironment.getIntervalSeconds(),wrfEnvironment.getE_we(),wrfEnvironment.getE_sn(),wrfEnvironment.getGeo_data_path(),wrfEnvironment.getPrefix(),wrfEnvironment.getRef_lat(),wrfEnvironment.getRef_lon());
-            runScript.changeNamelipsInput(wrfEnvironment.getNamelistWRFPath(),wrfEnvironment.getRunDays(),wrfEnvironment.getRunHours(),wrfEnvironment.getStartYear(),wrfEnvironment.getStartMonth(),wrfEnvironment.getStartDay(),wrfEnvironment.getStartHour(),wrfEnvironment.getEndYear(),wrfEnvironment.getEndMonth(),wrfEnvironment.getEndtDay(),wrfEnvironment.getEndHour(),wrfEnvironment.getIntervalSeconds(),wrfEnvironment.getMaxDom(),wrfEnvironment.getE_we(),wrfEnvironment.getE_sn(),wrfEnvironment.getNum_metgrid_levels(),wrfEnvironment.getNum_metgrid_soil_levels());
+            runScript.changeNamelistWPS(wrfEnvironment.getInputWPSPath(), wrfEnvironment.getStartDate(), wrfEnvironment.getEndDate(), wrfEnvironment.getMaxDom(), wrfEnvironment.getIntervalSeconds(), wrfEnvironment.getE_we(), wrfEnvironment.getE_sn(), wrfEnvironment.getGeo_data_path(), wrfEnvironment.getPrefix(), wrfEnvironment.getRef_lat(), wrfEnvironment.getRef_lon(), wrfEnvironment.getPole_lat(), wrfEnvironment.getPole_lon(), wrfEnvironment.getStand_lon(), wrfEnvironment.getMap_proj(), wrfEnvironment.getDx(), wrfEnvironment.getDy());
+            runScript.changeNamelipsInput(wrfEnvironment.getNamelistWRFPath(), wrfEnvironment.getRunDays(), wrfEnvironment.getRunHours(), wrfEnvironment.getStartYear(), wrfEnvironment.getStartMonth(), wrfEnvironment.getStartDay(), wrfEnvironment.getStartHour(), wrfEnvironment.getEndYear(), wrfEnvironment.getEndMonth(), wrfEnvironment.getEndtDay(), wrfEnvironment.getEndHour(), wrfEnvironment.getIntervalSeconds(), wrfEnvironment.getMaxDom(), wrfEnvironment.getE_we(), wrfEnvironment.getE_sn(), wrfEnvironment.getNum_metgrid_levels(), wrfEnvironment.getNum_metgrid_soil_levels(), wrfEnvironment.getDx(), wrfEnvironment.getDy());
 
             //run the WRF using the shell scripts
-            runScript.runScript("sh /Users/vidu/Documents/Development/Final_Year_Project/Development/Laridae/src/WRF/autoauto.sh");
-            long endCluster=System.currentTimeMillis();
-            double clusterTime=(endCluster-startCluster)/1000.0;
+            runScript.runScript("sh /home/ruveni/IdeaProjects/Laridae/src/WRF/autoauto.sh");
+            long endCluster = System.currentTimeMillis();
+            double clusterTime = (endCluster - startCluster) / 1000.0;
             clusterTimeArray.add(clusterTime);
+
+            //find a file name with wrfout_d01_2006-12-19_12:00:00
+            File dir = new File(wrfEnvironment.getTest_em_real_path());
+            File[] foundFiles = dir.listFiles((dir1, name) -> {
+                return name.startsWith("wrfout_");
+            });
+
+            if (foundFiles.length >= 1) {
+                File oldName = new File(foundFiles[0].getPath());
+                File newName = new File(wrfEnvironment.getTest_em_real_path() + "wrfOut" + (i + 1));
+                if (oldName.renameTo(newName)) {
+                    System.out.println("renamed");
+                } else {
+                    System.out.println("Error");
+                }
+            }
         }
-        long end=System.currentTimeMillis();
-        wrfTime=(end-start)/1000.0;
-        System.out.println("CEP Time : "+cepTime+" seconds");
-        System.out.println("ML Time : "+mlTime+" seconds");
-        System.out.println("WRF Time : "+wrfTime+" seconds");
-        for(int i=0;i<clusterTimeArray.size();i++){
-            System.out.println("Cluster "+(i+1)+" : "+clusterTimeArray.get(i));
+        long end = System.currentTimeMillis();
+        wrfTime = (end - start) / 1000.0;
+        System.out.println("CEP Time : " + cepTime + " seconds");
+        System.out.println("ML Time : " + mlTime + " seconds");
+        System.out.println("WRF Time : " + wrfTime + " seconds");
+        for (int i = 0; i < clusterTimeArray.size(); i++) {
+            System.out.println("Cluster " + (i + 1) + " : " + clusterTimeArray.get(i));
         }
 
-        System.out.println("Total Time : "+(cepTime+mlTime+wrfTime)+" seconds");
+        System.out.println("Total Time : " + (cepTime + mlTime + wrfTime) + " seconds");
     }
 
     public void handleAlertEvent(AlertEvent e) {
@@ -254,8 +340,8 @@ public class Main extends JFrame {
 //            double lonPositive = lon+180;
 //            dataPoints.add(Vectors.dense(lonPositive, latPositive));
 //        }
-        cepEnd=System.currentTimeMillis();
-        cepTime=(Math.abs(cepStart-cepEnd))/1000.0;
+        cepEnd = System.currentTimeMillis();
+        cepTime = (Math.abs(cepStart - cepEnd)) / 1000.0;
         CEPButton.setEnabled(false);
     }
 
@@ -392,6 +478,5 @@ public class Main extends JFrame {
             frame.setVisible(true);
         });
     }
-
 
 }

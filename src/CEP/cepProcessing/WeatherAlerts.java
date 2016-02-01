@@ -66,7 +66,7 @@ public class WeatherAlerts {
     public void checkLiftedIndex() {
         String checkIndex = siddhiManager.addQuery("from WeatherStream [liftedIndex<" + CEPEnvironment.THRESHOLD_LIFTED_INDEX + "] #window.length(50) as A " +
                 "join WeatherStream[liftedIndex<" + CEPEnvironment.THRESHOLD_LIFTED_INDEX + "] #window.length(50) as B " +
-                "on madis:isNearStation(A.latitude,A.longitude,B.latitude,B.longitude) " +
+                "on weather:isNearStation(A.latitude,A.longitude,B.latitude,B.longitude) " +
                 "select 'A' as streamId, A.stationId, A.latitude, A.longitude " +
                 "insert into FilteredDataStream ;");
 
@@ -93,7 +93,7 @@ public class WeatherAlerts {
     public void checkHelicity() {
         String checkIndex = siddhiManager.addQuery("from WeatherStream [helicity>" + CEPEnvironment.THRESHOLD_HELICITY + "] #window.length(50) as A " +
                 "join WeatherStream[helicity>" + CEPEnvironment.THRESHOLD_HELICITY + "] #window.length(50) as B " +
-                "on madis:isNearStation(A.latitude,A.longitude,B.latitude,B.longitude) " +
+                "on weather:isNearStation(A.latitude,A.longitude,B.latitude,B.longitude) " +
                 "select 'E' as streamId, A.stationId,A.latitude,A.longitude " +
                 "insert into FilteredDataStream ;");
 
@@ -120,7 +120,7 @@ public class WeatherAlerts {
     public void checkInhibition() {
         String checkIndex = siddhiManager.addQuery("from WeatherStream [inhibition<(" + CEPEnvironment.THRESHOLD_INHIBITION + ")] #window.length(50) as A " +
                 "join WeatherStream[inhibition<(" + CEPEnvironment.THRESHOLD_INHIBITION + ")] #window.length(50) as B " +
-                "on madis:isNearStation(A.latitude,A.longitude,B.latitude,B.longitude) " +
+                "on weather:isNearStation(A.latitude,A.longitude,B.latitude,B.longitude) " +
                 "select 'F' as streamId, A.stationId,A.latitude,A.longitude " +
                 "insert into FilteredDataStream ;");
 

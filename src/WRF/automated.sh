@@ -12,7 +12,6 @@
 START=$(date +%s);
 
 #set paths to following directories
-WRF_PATH="/home/ruveni/Data/TestWRF/WRFV3";
 WPS_PATH="/home/ruveni/Data/TestWRF/WPS";
 WRF_EMREAL_PATH="/home/ruveni/Data/TestWRF/WRFV3/test/em_real";
 
