@@ -222,8 +222,8 @@ public class Main extends JFrame {
 //            wrfEnvironment.setDx(0.26);//default : 30000
 //            wrfEnvironment.setDy(0.26);
 //            wrfEnvironment.setResolution(0.26);
-            wrfEnvironment.setE_sn(String.valueOf(NamelistCalc.get_e_ns(boundary, wrfEnvironment.getResolution())));
-            wrfEnvironment.setE_we(String.valueOf(NamelistCalc.get_e_we(boundary, wrfEnvironment.getResolution())));
+            wrfEnvironment.setE_sn(String.valueOf(NamelistCalc.get_e_ns(boundary, (int)wrfEnvironment.getResolution())));
+            wrfEnvironment.setE_we(String.valueOf(NamelistCalc.get_e_we(boundary, (int)wrfEnvironment.getResolution())));
 
             /*
             e_we = 74, 112,
