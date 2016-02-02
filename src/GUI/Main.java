@@ -16,7 +16,10 @@ import gov.nasa.worldwind.avlist.AVKey;
 import gov.nasa.worldwind.awt.WorldWindowGLCanvas;
 import gov.nasa.worldwind.geom.LatLon;
 import gov.nasa.worldwind.geom.Position;
+import gov.nasa.worldwind.globes.Earth;
 import gov.nasa.worldwind.globes.EarthFlat;
+import gov.nasa.worldwind.globes.EllipsoidalGlobe;
+import gov.nasa.worldwind.globes.FlatGlobe;
 import gov.nasa.worldwind.layers.*;
 import gov.nasa.worldwind.render.*;
 import gov.nasa.worldwind.util.StatusBar;
@@ -181,7 +184,7 @@ public class Main extends JFrame {
         long start = System.currentTimeMillis();
         boundaryArray = new ArrayList<>();
         ArrayList<Vector>[] clusters = GMMClass.run(dataPoints);
-        //ArrayList<Vector>[] clusters = KMeansClass.run(dataPoints, 20, 1);
+ //       ArrayList<Vector>[] clusters = KMeansClass.run(dataPoints, 20, 1);
 
         for (int i = 0; i < clusters.length; i++) {
             Vector[] bounds = KMeansClass.getBounds(clusters[i], 360, 180);
@@ -301,7 +304,7 @@ dx = 0.2695,
             System.out.println("Cluster " + (i + 1) + " : " + clusterTimeArray.get(i));
         }
 
-        System.out.println("Total Time : " + (cepTime + mlTime + wrfTime) + " seconds");
+//        System.out.println("Total Time : " + (cepTime + mlTime + wrfTime) + " seconds");
     }
 
     public void handleAlertEvent(AlertEvent e) {
