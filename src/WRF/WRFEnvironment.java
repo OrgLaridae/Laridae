@@ -4,7 +4,7 @@ package WRF;
  * Created by ruveni on 1/25/16.
  */
 public class WRFEnvironment {
-    private String inputWPSPath="/home/ruveni/Data/TestWRF/WPS/namelist.wps";
+    private String inputWPSPath="/Users/vidu/Documents/Development/Final_Year_Project/Tools/WRF/WPS/namelist.wps";
     private String startDate="'2006-12-19_12:00:00'";
     private String endDate="'2006-12-20_12:00:00'";
     private int maxDom=1;
@@ -23,7 +23,7 @@ public class WRFEnvironment {
     private double dy=30000;
 
     //namelist.input parameters to be changed
-    private String namelistWRFPath="/home/ruveni/Data/TestWRF/WRFV3/test/em_real/namelist.input";
+    private String namelistWRFPath="/Users/vidu/Documents/Development/Final_Year_Project/Tools/WRF/WRFV3/test/em_real/namelist.input";
     //int runDays,int runHours, String startYear, String startMonth, String startDay, String startHour, String endYear, String endMonth, String endDay, String endHour, long intervalSeconds, int maxDom, int e_we, int e_sn, int num_metgrid_levels, int num_metgrid_soil_levels) {
     private int runDays=0;
     private int runHours=24;

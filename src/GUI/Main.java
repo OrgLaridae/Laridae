@@ -6,6 +6,7 @@ import CEP.customEvents.Boundary;
 import CEP.customEvents.BoundaryEvent;
 import CEP.customEvents.Location;
 import CEP.main.CEP;
+import ML.Common;
 import ML.GMMClass;
 import ML.KMeansClass;
 import WRF.NamelistCalc;
@@ -39,6 +40,8 @@ import java.util.stream.Stream;
 
 import org.apache.spark.mllib.linalg.Vector;
 import org.apache.spark.mllib.linalg.Vectors;
+
+import Util.*;
 
 /**
  * This example demonstrates the simplest possible way to create a WorldWind application.
@@ -187,11 +190,18 @@ public class Main extends JFrame {
  //       ArrayList<Vector>[] clusters = KMeansClass.run(dataPoints, 20, 1);
 
         for (int i = 0; i < clusters.length; i++) {
-            Vector[] bounds = KMeansClass.getBounds(clusters[i], 360, 180);
-            double lat1 = bounds[0].apply(0) - 90;
-            double lon1 = bounds[0].apply(1) - 180;
-            double lat2 = bounds[1].apply(0) - 90;
-            double lon2 = bounds[1].apply(1) - 180;
+            Vector[] bounds = Common.getBounds(clusters[i], 360, 180);
+            double x1 = bounds[0].apply(0);// - 90;
+            double y1 = bounds[0].apply(1);// - 180;
+            double x2 = bounds[1].apply(0);// - 90;
+            double y2 = bounds[1].apply(1);// - 180;
+
+            double[] _1 = Lambert_LatLon.lambertToLatLon(0, x1, y1);
+            double[] _2 = Lambert_LatLon.lambertToLatLon(0, x2, y1);
+            double[] _3 = Lambert_LatLon.lambertToLatLon(0, x2, y2);
+            double[] _4 = Lambert_LatLon.lambertToLatLon(0, x1, y2);
+
+
 
             ShapeAttributes attributes = configureBounderyAttributes(Material.ORANGE, Material.ORANGE);
             boundaryArray.add(new Boundary(lat1, lat2, lon1, lon2));
@@ -316,13 +326,15 @@ dx = 0.2695,
             double lat = Double.parseDouble(co.getLatitude());
             double lon = Double.parseDouble(co.getLongitude());
 
+            double x = Double.parseDouble(co.getLambertX());
+            double y = Double.parseDouble(co.getLambertY());
+
             attributes = configurePointAttributes(Material.RED);
             createPoint(dataPointLayer, attributes, LatLon.fromDegrees(lat, lon));
 
-            double latPositive = lat + 90;
-            double lonPositive = lon + 180;
 
-            dataPoints.add(Vectors.dense(lonPositive, latPositive));
+            //dataPoints.add(Vectors.dense(lonPositive, latPositive));
+            dataPoints.add(Vectors.dense(x, y));
         }
 //        System.out.println(dataPoints.size());
 
