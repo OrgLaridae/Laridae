@@ -10,24 +10,28 @@ import java.util.ArrayList;
  */
 public class Common {
 
-    public static Vector[] getBounds(ArrayList<Vector> list, int lon, int lat){
-        double left = 0;
-        double right = lon;
-        double top = lat;
-        double bottom = 0;
+    public static Vector[] getBounds(ArrayList<Vector> list){
+        double left = -180;
+        double right = 180;
+        double top = 90;
+        double bottom = -90;
 
         for(Vector point:list){
-            if(left<point.apply(0)){
-                left = point.apply(0);
+            double[] latLon = Util.Lambert_LatLon.lambertToLatLon(point.apply(0), point.apply(1), 0, 0, 0, 0);
+            double latitude = Math.toDegrees(latLon[0]);
+            double longitude = Math.toDegrees(latLon[1]);
+
+            if(left<longitude){
+                left = longitude;
             }
-            if(right>point.apply(0)){
-                right = point.apply(0);
+            if(right>longitude){
+                right = longitude;
             }
-            if(top>point.apply(1)){
-                top = point.apply(1);
+            if(top>latitude){
+                top = latitude;
             }
-            if(bottom<point.apply(1)){
-                bottom = point.apply(1);
+            if(bottom<latitude){
+                bottom = latitude;
             }
 
         }

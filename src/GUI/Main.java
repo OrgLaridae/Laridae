@@ -190,16 +190,11 @@ public class Main extends JFrame {
  //       ArrayList<Vector>[] clusters = KMeansClass.run(dataPoints, 20, 1);
 
         for (int i = 0; i < clusters.length; i++) {
-            Vector[] bounds = Common.getBounds(clusters[i], 360, 180);
-            double x1 = bounds[0].apply(0);// - 90;
-            double y1 = bounds[0].apply(1);// - 180;
-            double x2 = bounds[1].apply(0);// - 90;
-            double y2 = bounds[1].apply(1);// - 180;
-
-            double[] _1 = Lambert_LatLon.lambertToLatLon(0, x1, y1);
-            double[] _2 = Lambert_LatLon.lambertToLatLon(0, x2, y1);
-            double[] _3 = Lambert_LatLon.lambertToLatLon(0, x2, y2);
-            double[] _4 = Lambert_LatLon.lambertToLatLon(0, x1, y2);
+            Vector[] bounds = Common.getBounds(clusters[i]);
+            double lat1 = bounds[0].apply(0);// - 90;
+            double lon1 = bounds[0].apply(1);// - 180;
+            double lat2 = bounds[1].apply(0);// - 90;
+            double lon2 = bounds[1].apply(1);// - 180;
 
 
 
