@@ -1,10 +1,12 @@
 package CEP.customEvents;
 
 
+import java.io.Serializable;
+
 /**
  * Created by ruveni on 1/25/16.
  */
-public class Boundary {
+public class Boundary  implements Serializable {
     private double minLatitude;
     private double minLongitude;
     private double maxLatitude;

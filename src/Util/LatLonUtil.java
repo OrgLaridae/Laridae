@@ -1,6 +1,9 @@
 package Util;
 
-public class Lambert_LatLon {
+import gov.nasa.worldwind.geom.Angle;
+import gov.nasa.worldwind.geom.LatLon;
+
+public class LatLonUtil {
     public static double[] latLonToLambert
             (double latitude, double longitude, double refLatitude, double standardParallel1,  double standardParallel2,
              double refLongitude){
@@ -58,4 +61,14 @@ public class Lambert_LatLon {
     private static int sign(double val){
         return val>0? 1:-1;
     }
+
+
+//    public LatLon tunnel(LatLon latLon){
+//        double latitude = latLon.getLatitude().getDegrees();
+//        double longitude = latLon.getLongitude().getDegrees();
+//
+//
+//
+//        return new LatLon(latitude.add())
+//    }
 }
