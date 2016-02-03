@@ -21,6 +21,8 @@ public class CEPInitialize {
         siddhiConfiguration.setSiddhiExtensions(extensionClasses);
 
         SiddhiManager siddhiManager = new SiddhiManager(siddhiConfiguration);
+        siddhiManager.enableStats(false);
+        siddhiManager.enableTrace(false);
 
         //stream definitions
         siddhiManager.defineStream("define stream WeatherStream (stationId string, latitude double, longitude double, liftedIndex double, helicity double, inhibition double) ");
