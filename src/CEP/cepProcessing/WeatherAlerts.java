@@ -73,17 +73,7 @@ public class WeatherAlerts {
 
         siddhiManager.addCallback(checkIndex, new QueryCallback() {
             public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-                int k = inEvents.length;
-                //System.out.println("Lifted Index : " + inEvents[k - 1].getData(1));
-
-                //adds the filtered coordinate to the array list
-                if (coordString.indexOf(inEvents[k - 1].getData(2) + ":" + inEvents[k - 1].getData(3)) < 0) {
-                    coordString.append(inEvents[k - 1].getData(2) + ":" + inEvents[k - 1].getData(3) + ",");
-                    String latitude = String.valueOf(inEvents[k - 1].getData(2));
-                    String longitude = String.valueOf(inEvents[k - 1].getData(3));
-                    double[] lambertValues = Lambert_LatLon.latLonToLambert(Math.toRadians(Double.parseDouble(latitude)), 0, 0, 0, Math.toRadians(Double.parseDouble(longitude)), 0);
-                    coordinates.add(new Location(latitude, longitude, String.valueOf(lambertValues[0]), String.valueOf(lambertValues[1])));
-                }
+                processData(inEvents);
             }
         });
     }
@@ -103,17 +93,7 @@ public class WeatherAlerts {
 
         siddhiManager.addCallback(checkIndex, new QueryCallback() {
             public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-                int k = inEvents.length;
-                //System.out.println("Helicity Index : " + inEvents[k - 1].getData(1));
-
-                //adds the filtered coordinate to the array list
-                if (coordString.indexOf(inEvents[k - 1].getData(2) + ":" + inEvents[k - 1].getData(3)) < 0) {
-                    coordString.append(inEvents[k - 1].getData(2) + ":" + inEvents[k - 1].getData(3) + ",");
-                    String latitude = String.valueOf(inEvents[k - 1].getData(2));
-                    String longitude = String.valueOf(inEvents[k - 1].getData(3));
-                    double[] lambertValues = Lambert_LatLon.latLonToLambert(Math.toRadians(Double.parseDouble(latitude)), 0, 0, 0, Math.toRadians(Double.parseDouble(longitude)), 0);
-                    coordinates.add(new Location(latitude, longitude, String.valueOf(lambertValues[0]), String.valueOf(lambertValues[1])));
-                }
+                processData(inEvents);
             }
         });
     }
@@ -133,17 +113,7 @@ public class WeatherAlerts {
 
         siddhiManager.addCallback(checkIndex, new QueryCallback() {
             public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-                int k = inEvents.length;
-                //System.out.println("Inhibition Index : " + inEvents[k - 1].getData(1));
-
-                //adds the filtered coordinate to the array list
-                if (coordString.indexOf(inEvents[k - 1].getData(2) + ":" + inEvents[k - 1].getData(3)) < 0) {
-                    coordString.append(inEvents[k - 1].getData(2) + ":" + inEvents[k - 1].getData(3) + ",");
-                    String latitude = String.valueOf(inEvents[k - 1].getData(2));
-                    String longitude = String.valueOf(inEvents[k - 1].getData(3));
-                    double[] lambertValues = Lambert_LatLon.latLonToLambert(Math.toRadians(Double.parseDouble(latitude)), 0, 0, 0, Math.toRadians(Double.parseDouble(longitude)), 0);
-                    coordinates.add(new Location(latitude, longitude, String.valueOf(lambertValues[0]), String.valueOf(lambertValues[1])));
-                }
+                processData(inEvents);
             }
         });
     }
@@ -181,5 +151,18 @@ public class WeatherAlerts {
 
             }
         });
+    }
+
+    public void processData(Event[] inEvents){
+        int k = inEvents.length;
+
+        //adds the filtered coordinate to the arrEvent[] inEventsay list
+        if (coordString.indexOf(inEvents[k - 1].getData(2) + ":" + inEvents[k - 1].getData(3)) < 0) {
+            coordString.append(inEvents[k - 1].getData(2) + ":" + inEvents[k - 1].getData(3) + ",");
+            String latitude = String.valueOf(inEvents[k - 1].getData(2));
+            String longitude = String.valueOf(inEvents[k - 1].getData(3));
+            double[] lambertValues = Lambert_LatLon.latLonToLambert(Math.toRadians(Double.parseDouble(latitude)), 0, 0, 0, Math.toRadians(Double.parseDouble(longitude)), 0);
+            coordinates.add(new Location(latitude, longitude, String.valueOf(lambertValues[0]), String.valueOf(lambertValues[1])));
+        }
     }
 }
