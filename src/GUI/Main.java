@@ -262,7 +262,7 @@ public class Main extends JFrame {
             socket.close();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Network Unreachable");
         }
 
 //        FileOutputStream fos = new FileOutputStream("C:\\test2.xml");
