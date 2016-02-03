@@ -4,7 +4,7 @@ import CEP.customEvents.AlertEvent;
 import CEP.customEvents.BoundaryEvent;
 import CEP.customEvents.Location;
 import GUI.Main;
-import Util.Lambert_LatLon;
+import Util.LatLonUtil;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.query.output.callback.QueryCallback;
@@ -81,7 +81,7 @@ public class WeatherAlerts {
                     coordString.append(inEvents[k - 1].getData(2) + ":" + inEvents[k - 1].getData(3) + ",");
                     String latitude = String.valueOf(inEvents[k - 1].getData(2));
                     String longitude = String.valueOf(inEvents[k - 1].getData(3));
-                    double[] lambertValues = Lambert_LatLon.latLonToLambert(Math.toRadians(Double.parseDouble(latitude)), 0, 0, 0, Math.toRadians(Double.parseDouble(longitude)), 0);
+                    double[] lambertValues = LatLonUtil.latLonToLambert(Math.toRadians(Double.parseDouble(latitude)), Math.toRadians(Double.parseDouble(longitude)), 10, 30, 60, 10);
                     coordinates.add(new Location(latitude, longitude, String.valueOf(lambertValues[0]), String.valueOf(lambertValues[1])));
                 }
             }
@@ -111,7 +111,7 @@ public class WeatherAlerts {
                     coordString.append(inEvents[k - 1].getData(2) + ":" + inEvents[k - 1].getData(3) + ",");
                     String latitude = String.valueOf(inEvents[k - 1].getData(2));
                     String longitude = String.valueOf(inEvents[k - 1].getData(3));
-                    double[] lambertValues = Lambert_LatLon.latLonToLambert(Math.toRadians(Double.parseDouble(latitude)), 0, 0, 0, Math.toRadians(Double.parseDouble(longitude)), 0);
+                    double[] lambertValues = LatLonUtil.latLonToLambert(Math.toRadians(Double.parseDouble(latitude)), Math.toRadians(Double.parseDouble(longitude)), 10, 30, 60, 10);
                     coordinates.add(new Location(latitude, longitude, String.valueOf(lambertValues[0]), String.valueOf(lambertValues[1])));
                 }
             }
@@ -141,7 +141,7 @@ public class WeatherAlerts {
                     coordString.append(inEvents[k - 1].getData(2) + ":" + inEvents[k - 1].getData(3) + ",");
                     String latitude = String.valueOf(inEvents[k - 1].getData(2));
                     String longitude = String.valueOf(inEvents[k - 1].getData(3));
-                    double[] lambertValues = Lambert_LatLon.latLonToLambert(Math.toRadians(Double.parseDouble(latitude)), 0, 0, 0, Math.toRadians(Double.parseDouble(longitude)), 0);
+                    double[] lambertValues = LatLonUtil.latLonToLambert(Math.toRadians(Double.parseDouble(latitude)), Math.toRadians(Double.parseDouble(longitude)), 10, 30, 60, 10);
                     coordinates.add(new Location(latitude, longitude, String.valueOf(lambertValues[0]), String.valueOf(lambertValues[1])));
                 }
             }

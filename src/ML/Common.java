@@ -1,5 +1,6 @@
 package ML;
 
+import Util.LatLonUtil;
 import org.apache.spark.mllib.linalg.Vector;
 import org.apache.spark.mllib.linalg.Vectors;
 
@@ -17,7 +18,7 @@ public class Common {
         double bottom = -90;
 
         for(Vector point:list){
-            double[] latLon = Util.Lambert_LatLon.lambertToLatLon(point.apply(0), point.apply(1), 0, 0, 0, 0);
+            double[] latLon = LatLonUtil.lambertToLatLon(point.apply(0), point.apply(1), 0, 0, 0, 0);
             double latitude = Math.toDegrees(latLon[0]);
             double longitude = Math.toDegrees(latLon[1]);
 
