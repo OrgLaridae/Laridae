@@ -30,6 +30,4 @@ END=$(date +%s);
 DIFF=$(( $END - $START ));
 
 echo "";
-echo "WRF model compiled successfully";
-echo "runtime = $DIFF seconds";
-echo "";
+echo "WRF model compiled successfully";;

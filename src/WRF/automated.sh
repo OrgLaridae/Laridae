@@ -69,5 +69,3 @@ DIFF=$(( $END - $START ));
 
 echo "";
 echo "WRF model completed successfully";
-echo "runtime = $DIFF seconds";
-echo "";
