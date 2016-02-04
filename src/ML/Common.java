@@ -19,8 +19,11 @@ public class Common {
 
         for(Vector point:list){
             //double[] latLon = LatLonUtil.lambertToLatLon(point.apply(0), point.apply(1), 0, 0, 0, 0);
-            double latitude = Math.toDegrees(point.apply(0));
-            double longitude = Math.toDegrees(point.apply(1));
+            double latitude = point.apply(0);
+            double longitude = point.apply(1);
+
+
+            System.out.println(latitude + " " + longitude);
 
             if(left<longitude){
                 left = longitude;

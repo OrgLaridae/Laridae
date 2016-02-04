@@ -231,15 +231,14 @@ public class Main extends JFrame {
             double lon2 = bounds[1].apply(1) - 180;
 
 
-
-            //ShapeAttributes attributes = configureBounderyAttributes(Material.ORANGE, Material.ORANGE);
+            attributes = configureBounderyAttributes(Material.ORANGE, Material.ORANGE);
             boundaryArray.add(new Boundary(lat1, lat2, lon1, lon2));
 
             LatLon upperLeft = LatLon.fromDegrees(lat1, lon1);
             LatLon lowerRight = LatLon.fromDegrees(lat2, lon2);
             System.out.println("Lon : " + lon1 + " " + lon2);
             System.out.println("Lat : " + lat1 + " " + lat2);
-            //createBoundery(MLBoundLayer, attributes, upperLeft, lowerRight, "ML boundary");
+            createBoundery(MLBoundLayer, attributes, upperLeft, lowerRight, "ML boundary");
         }
         MLButton.setEnabled(false);
         long end = System.currentTimeMillis();
@@ -390,6 +389,7 @@ public class Main extends JFrame {
 
             //System.out.println(x + "   " +y);
 
+            System.out.println(latPositive + " " + lonPositive);
             dataPoints.add(Vectors.dense(latPositive, lonPositive));
             //dataPoints.add(Vectors.dense(lat, ));
         }
@@ -441,7 +441,7 @@ public class Main extends JFrame {
         double width = LatLon.greatCircleDistance(left, right).getRadians()*(globe.getRadiusAt(left)+globe.getRadiusAt(right))/2;
         LatLon upperLeft = LatLon.fromDegrees(maxLat, minLon);
         LatLon lowerRight = LatLon.fromDegrees(minLat, maxLon);
-        CEPBoundLayer.removeAllRenderables();
+        //CEPBoundLayer.removeAllRenderables();
         //createBoundery(CEPBoundLayer, attributes, upperLeft, lowerRight, "CEP boundary");
         //createBoundery(CEPBoundLayer, attributes, middle, height, width, "CEP boundary");
 
