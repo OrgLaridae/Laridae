@@ -20,15 +20,8 @@ import java.util.ArrayList;
     Necessary GRIB parameters
     =================================
     Best 4 layer lifted index @ Layer between 2 level at pressure difference from ground to level layer (K)
-    Dew point temperature @ Isobaric surface (K) 850hPa
-    Dew point temperature @ Isobaric surface (K) 700hPa
-    Dew point temperature @ Isobaric surface (K) 500hPa
-    Temperature @ Isobaric surface (K) 500hPa
-    Temperature @ Isobaric surface (K) 850hPa
-    Temperature @ Isobaric surface (K) 700hPa
     Storm relative helicity @ Layer between 2 specified height level above ground layer (m2/s2) 500m
     Convective inhibition @ Ground or water surface (J/kg)
-    Precipitable water @ Entire atmosphere (kg/m2)
  */
 public class WeatherAlerts {
     private SiddhiManager siddhiManager;
@@ -48,7 +41,6 @@ public class WeatherAlerts {
         checkLiftedIndex();
         checkHelicity();
         checkInhibition();
-        //sendFilteredWeatherData();
         calculateCommonBoundary();
     }
 
@@ -73,17 +65,7 @@ public class WeatherAlerts {
 
         siddhiManager.addCallback(checkIndex, new QueryCallback() {
             public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-                int k = inEvents.length;
-                //System.out.println("Lifted Index : " + inEvents[k - 1].getData(1));
-
-                //adds the filtered coordinate to the array list
-                if (coordString.indexOf(inEvents[k - 1].getData(2) + ":" + inEvents[k - 1].getData(3)) < 0) {
-                    coordString.append(inEvents[k - 1].getData(2) + ":" + inEvents[k - 1].getData(3) + ",");
-                    String latitude = String.valueOf(inEvents[k - 1].getData(2));
-                    String longitude = String.valueOf(inEvents[k - 1].getData(3));
-                    double[] lambertValues = LatLonUtil.latLonToLambert(Math.toRadians(Double.parseDouble(latitude)), Math.toRadians(Double.parseDouble(longitude)), 10, 30, 60, 10);
-                    coordinates.add(new Location(latitude, longitude, String.valueOf(lambertValues[0]), String.valueOf(lambertValues[1])));
-                }
+                processData(inEvents);
             }
         });
     }
@@ -103,17 +85,7 @@ public class WeatherAlerts {
 
         siddhiManager.addCallback(checkIndex, new QueryCallback() {
             public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-                int k = inEvents.length;
-                //System.out.println("Helicity Index : " + inEvents[k - 1].getData(1));
-
-                //adds the filtered coordinate to the array list
-                if (coordString.indexOf(inEvents[k - 1].getData(2) + ":" + inEvents[k - 1].getData(3)) < 0) {
-                    coordString.append(inEvents[k - 1].getData(2) + ":" + inEvents[k - 1].getData(3) + ",");
-                    String latitude = String.valueOf(inEvents[k - 1].getData(2));
-                    String longitude = String.valueOf(inEvents[k - 1].getData(3));
-                    double[] lambertValues = LatLonUtil.latLonToLambert(Math.toRadians(Double.parseDouble(latitude)), Math.toRadians(Double.parseDouble(longitude)), 10, 30, 60, 10);
-                    coordinates.add(new Location(latitude, longitude, String.valueOf(lambertValues[0]), String.valueOf(lambertValues[1])));
-                }
+                processData(inEvents);
             }
         });
     }
@@ -133,17 +105,7 @@ public class WeatherAlerts {
 
         siddhiManager.addCallback(checkIndex, new QueryCallback() {
             public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-                int k = inEvents.length;
-                //System.out.println("Inhibition Index : " + inEvents[k - 1].getData(1));
-
-                //adds the filtered coordinate to the array list
-                if (coordString.indexOf(inEvents[k - 1].getData(2) + ":" + inEvents[k - 1].getData(3)) < 0) {
-                    coordString.append(inEvents[k - 1].getData(2) + ":" + inEvents[k - 1].getData(3) + ",");
-                    String latitude = String.valueOf(inEvents[k - 1].getData(2));
-                    String longitude = String.valueOf(inEvents[k - 1].getData(3));
-                    double[] lambertValues = LatLonUtil.latLonToLambert(Math.toRadians(Double.parseDouble(latitude)), Math.toRadians(Double.parseDouble(longitude)), 10, 30, 60, 10);
-                    coordinates.add(new Location(latitude, longitude, String.valueOf(lambertValues[0]), String.valueOf(lambertValues[1])));
-                }
+                processData(inEvents);
             }
         });
     }
@@ -164,11 +126,11 @@ public class WeatherAlerts {
                     String output = inEvents[k - 1].getData(0) + " " + inEvents[k - 1].getData(1) + " " + inEvents[k - 1].getData(2) + " " + inEvents[k - 1].getData(3);
                     System.out.println(inEvents[k - 1].getData(0) + " " + inEvents[k - 1].getData(1) + " " + inEvents[k - 1].getData(2) + " " + inEvents[k - 1].getData(3));
 
+                    //events to invoke the gui
                     AlertEvent eventt = new AlertEvent(this, coordinates);
                     listener.handleAlertEvent(eventt);
 
                     BoundaryEvent event = new BoundaryEvent(this, output);
-                    //invokes the listener to detect the filtered coordinates
                     listener.handelBoundaryEvent(event);
 
                     //resets the values
@@ -181,5 +143,24 @@ public class WeatherAlerts {
 
             }
         });
+    }
+
+    //processes the output data from the CEP
+    public void processData(Event[] inEvents) {
+        try {
+            int k = inEvents.length;
+
+            //adds the filtered coordinate to the arrEvent[] inEventsay list
+            if (coordString.indexOf(inEvents[k - 1].getData(2) + ":" + inEvents[k - 1].getData(3)) < 0) {
+                coordString.append(inEvents[k - 1].getData(2) + ":" + inEvents[k - 1].getData(3) + ",");
+                String latitude = String.valueOf(inEvents[k - 1].getData(2));
+                String longitude = String.valueOf(inEvents[k - 1].getData(3));
+                double[] lambertValues = LatLonUtil.latLonToLambert(Math.toRadians(Double.parseDouble(latitude)), Math.toRadians(Double.parseDouble(longitude)), 10, 30, 60, 10);
+                coordinates.add(new Location(latitude, longitude, String.valueOf(lambertValues[0]), String.valueOf(lambertValues[1])));
+            }
+        } catch (Exception e) {
+            //null pointer exception
+            //no data to be processed
+        }
     }
 }

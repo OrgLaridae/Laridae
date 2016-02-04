@@ -40,23 +40,20 @@ public class IsNearStation extends FunctionExecutor {
             lonA = Double.parseDouble(String.valueOf(((Object[]) o)[1]));
             latB = Double.parseDouble(String.valueOf(((Object[]) o)[2]));
             lonB = Double.parseDouble(String.valueOf(((Object[]) o)[3]));
-//            dLat = Math.toRadians(latB - latA);
-//            dLng = Math.toRadians(lonB - lonA);
-//
-//            //calculates the actual distance
-//            a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(Math.toRadians(latA)) * Math.cos(Math.toRadians(latB)) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
-//            c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-//            dist = (double) (EARTH_RADIUS * c);
 
             if(latA==latB && lonA==lonB){
+                //if two given points are the same
                 isNear=false;
             }else{
+                //calculates the distance between two location points
                 double theta = lonB - lonA;
-                double dist = Math.sin(deg2rad(latB)) * Math.sin(deg2rad(latA)) + Math.cos(deg2rad(latB)) * Math.cos(deg2rad(latA)) * Math.cos(deg2rad(theta));
+                double dist = Math.sin(Math.toRadians(latB)) * Math.sin(Math.toRadians(latA)) + Math.cos(Math.toRadians(latB)) * Math.cos(Math.toRadians(latA)) * Math.cos(Math.toRadians(theta));
                 dist = Math.acos(dist);
-                dist = rad2deg(dist);
+                dist = Math.toDegrees(dist);
+                //in kilo meters
                 dist = dist * 60 * 1.1515*1.609344;
 
+                //compares the calculated value with a threshold value
                 if (dist < CEPEnvironment.DISTANCE_THRESHOLD) {
                     isNear = true;
                 }
@@ -68,14 +65,6 @@ public class IsNearStation extends FunctionExecutor {
     @Override
     public void destroy() {
 
-    }
-
-    private static double deg2rad(double deg) {
-        return (deg * Math.PI / 180.0);
-    }
-
-    private static double rad2deg(double rad) {
-        return (rad * 180 / Math.PI);
     }
 
     @Override
