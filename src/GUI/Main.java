@@ -249,17 +249,19 @@ public class Main extends JFrame {
     private void runWRF(){
 
         try {
-            Socket socket = new Socket("192.168.8.100", 4444);
+            Socket socket = new Socket("192.168.8.102", 4444);
 
-            OutputStream out = socket.getOutputStream();
+            if(socket!=null) {
+                OutputStream out = socket.getOutputStream();
 
-            ObjectOutputStream oos = new ObjectOutputStream(out);
-            oos.writeObject(boundaryArray);
+                ObjectOutputStream oos = new ObjectOutputStream(out);
+                oos.writeObject(boundaryArray);
 
-            oos.flush();
-            oos.close();
-            out.close();
-            socket.close();
+                oos.flush();
+                oos.close();
+                out.close();
+                socket.close();
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
