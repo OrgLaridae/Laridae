@@ -12,15 +12,15 @@ import java.util.ArrayList;
 public class Common {
 
     public static Vector[] getBounds(ArrayList<Vector> list){
-        double left = -180;
-        double right = 180;
-        double top = 90;
-        double bottom = -90;
+        double left = 0;
+        double right = 360;
+        double top = 180;
+        double bottom = 0;
 
         for(Vector point:list){
-            double[] latLon = LatLonUtil.lambertToLatLon(point.apply(0), point.apply(1), 0, 0, 0, 0);
-            double latitude = Math.toDegrees(latLon[0]);
-            double longitude = Math.toDegrees(latLon[1]);
+            //double[] latLon = LatLonUtil.lambertToLatLon(point.apply(0), point.apply(1), 0, 0, 0, 0);
+            double latitude = Math.toDegrees(point.apply(0));
+            double longitude = Math.toDegrees(point.apply(1));
 
             if(left<longitude){
                 left = longitude;
