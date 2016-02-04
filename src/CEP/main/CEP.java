@@ -11,11 +11,12 @@ import org.wso2.siddhi.core.SiddhiManager;
  */
 public class CEP {
     public static void run(Main main){
+        //initialize the CEP preconditions
         CEPInitialize cep=new CEPInitialize();
         SiddhiManager siddhiManager=cep.CEPInit();
         WeatherAlerts weatherAlerts=new WeatherAlerts(siddhiManager,main);
 
-        //csv data feed - grib data
+        //csv data feed - grib data and feeds to the CEP engine
         CSVFileReader csvReader=new CSVFileReader(weatherAlerts);
         Thread csvThread=new Thread(csvReader);
         csvThread.start();

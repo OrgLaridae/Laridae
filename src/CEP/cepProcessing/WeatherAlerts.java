@@ -145,6 +145,7 @@ public class WeatherAlerts {
         });
     }
 
+    //processes the output data from the CEP
     public void processData(Event[] inEvents) {
         try {
             int k = inEvents.length;
